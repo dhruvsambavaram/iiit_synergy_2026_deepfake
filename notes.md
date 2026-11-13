@@ -2,3 +2,4 @@
 - 2026-11-13: switched train.py to a fixed 6-min wall-clock budget (Karpathy-style). r0001 used 5 fixed epochs (3.4 min), so FIRST loop run = unchanged config under the time budget (re-baseline), THEN the lr/warmup hypothesis.
 - r0002 rebaseline (6-min budget, 9 epochs vs 5): KEEP proxy 36.76 (+2.29). iid 0.826 / ood 0.717. Still worst on pixelate (0.55) and noise05. Next: lr 1e-4 + warmup 1.0.
 - r0003 lr 1e-4 + warmup 1.0: DISCARD 31.16 (-5.60). Underfits (final loss 0.31 vs 0.07); high ep-1 loss was just warmup, not instability. Higher lr (1e-3) is the more promising direction; queue after cutout.
+- r0004 cutout boxes p=0.5 (1-2 boxes, 10-35% side): DISCARD 35.01 (-1.75). iid flat, ood -0.025; even the cutout variant didn't improve much. Model is underfitting-in-budget rather than lacking occlusion invariance? Next: lr 1e-3 (ladder 1), then JPEG aug.
