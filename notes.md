@@ -64,3 +64,12 @@
 - **FINAL-RETRAIN LESSON (human-confirmed):** when retraining on train+val, keep the validated EPOCH counts (xception41 ≈4 ep, B0 ≈5-8 ep; read the exact steps from runs/<id>/train_log.json), not the 6-min wall clock (machine speed varies) and not more epochs (r0028-r0030 show longer = worse).
 - Human confirmed: their aug order = Resize → HFlip → ShiftScaleRotate → JPEG → GaussianBlur → ColorJitter → CoarseDropout → Normalize, matching my reimplementation. acc@best-thr is the matching comparison for their same-fold-threshold F1.
 - Queue: head-to-head A/B/C → densenet121.ra_in1k lr 1e-3/3e-3 (ens vs r0019) → xception r0019 cfg seeds 2,3,4 → greedy forward ensemble selection (3/4/5 models, ≤1 per run).
+
+## Head-to-head vs their recipe
+Their recipe reimplemented from published hyperparameters only (patch: /tmp/ar_scratch/apply_theirs.py; their head swap allowed for A/B only). "Their split" = StratifiedKFold(5, rs=42) fold 0, 5600/1400, **8.4% of val images have a near-dup in train**. Their published Swin-T (best epoch): 0.927 AUC.
+| run | model / recipe | split | epochs | train min | AUC | acc@0.5 | acc@best-thr | iid | ood | unseen | worst | proxy |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| A rs_swin_theirs | swin_tiny, their recipe | theirs (8.4% leak) | 10 | 16.1 | **0.9248** | 0.8886 | 0.8914 | — | — | — | — | — |
+| B r0031 | swin_tiny, their recipe | ours | 10 | 14.4 | — | 0.797 (iid 0.838 / ood 0.772) | Youden 0.803 | 0.882 | 0.799 | 0.823 | 0.737 (pixelate) | 46.91 |
+| r0019 (ref) | xception41 lr 3e-3, our recipe | ours | 4 | 6.0 | — | 0.826 (iid 0.838 / ood 0.818) | Youden 0.830 | 0.893 | 0.848 | 0.863 | 0.812 (pixelate) | 51.49 |
+- A matches their 0.927 → our reimplementation and data pipeline agree with theirs. B: on our harness their recipe is -4.58 vs r0019, mainly ood (-0.049) and corruption robustness (worst 0.737). Same iid acc (0.838) as r0019 → the gap is generalisation to unseen domains. Ens r0019+r0031 51.31 (corr 0.836) < r0019; r0019+r0020+r0031 51.86; r0019+r0024+r0031 51.96. The Swin ensemble candidate is covered by B → skip a separate Swin run.
