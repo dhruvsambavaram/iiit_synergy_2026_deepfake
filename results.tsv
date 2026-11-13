@@ -40,3 +40,4 @@ time	run_id	verdict	proxy	delta	p_better	auc_main	auc_iid	auc_ood	auc_seen	auc_u
 2026-11-13 21:25	r0039	DISCARD	50.2360	-1.2585	0.0220	0.8618	0.8883	0.8354	0.8486	0.8531	0.8268	pixelate	4.0088	16.3065	525.5443	6.0151	consistency_weight 3.0 (seed 1 rerun)
 2026-11-13 21:34	r0040	DISCARD	47.9920	-3.5025	0.0000	0.8471	0.8751	0.8191	0.8301	0.8334	0.7948	pixelate	4.0088	16.3065	443.7652	6.0091	consistency_weight 6.0
 2026-11-13 21:43	r0041	DISCARD	49.1119	-2.3826	0.0000	0.8551	0.8775	0.8328	0.8370	0.8419	0.7937	pixelate	4.0088	16.3065	537.1702	6.0183	OneOf degrade p=0.4 on consistency w=3.0 base
+2026-11-13 21:52	r0042	DISCARD	49.5181	-1.9764	0.0060	0.8581	0.8932	0.8229	0.8408	0.8441	0.8116	pixelate	4.0088	16.3065	538.1184	6.0078	label smoothing 0.1 on consistency w=3.0 base
