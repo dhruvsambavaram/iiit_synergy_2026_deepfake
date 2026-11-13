@@ -18,3 +18,11 @@
 - Next: retest cutout at lr 8e-3, then JPEG aug, then blur/pixelate aug (aimed at pixelate and gblur2).
 - r0011 cutout p=0.5 @ lr 8e-3: DISCARD 47.95 (-0.40, p=0.26). iid +0.008 but ood -0.012. Cutout doesn't help at either lr, so drop it. Next: JPEG q U(30,95) p=0.5.
 - r0012 JPEG q U(30,95) p=0.5: DISCARD 47.35 (-1.00, p=0.07). jpeg30 is unchanged and ood -0.016. CPU aug also cost ~4% of steps. Generic degradation augs aren't paying off so far; high lr is already regularising. Next: OneOf(blur/noise/downup/pixelate) p=0.4, aimed at pixelate and gblur2.
+- r0013 OneOf(blur/noise/downup/pixelate) p=0.4: INCONCLUSIVE 49.31 (+0.96, p=0.88). r0014 seed1: INCONCLUSIVE 48.70 (+0.35, p=0.69). Reverted per the rules, but both seeds were positive (mean +0.66, iid +0.01). Probably a small real gain; worth a combined/longer test in the final stage.
+
+## Ensemble candidates
+(ensemble = mean of probabilities with r0009 via tools/ensemble_eval.py; corr = clean-pred correlation)
+| run | config | single proxy | ens w/ r0009 | corr |
+|---|---|---|---|---|
+| r0008 | B0 lr 4e-3 | 46.36 | 49.62 | 0.815 |
+| r0013 | B0 lr 8e-3 + OneOf degrade p=0.4 | 49.31 | 50.01 | 0.904 |
