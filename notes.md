@@ -49,3 +49,10 @@
 - Next (ladder 3, label noise): label smoothing 0.1 on top of consistency.
 - r0026/r0027 label smoothing 0.1 on consistency B0: +0.31 (p=0.67) / +0.59 (p=0.83) vs r0024; vs seed-matched r0025 the seed-1 run is +1.09 (p=0.96). Positive on both seeds but not KEEP vs base → reverted. Likely a small real gain; a candidate to fold in for the final stage. Ens r0019+r0020+r0027: 51.79.
 - 2026-11-13 ~18:00: HUMAN OVERRIDE — ladder paused; architecture pool fixed (xception41 + B0). Running 3 long-budget runs (not loop experiments, not committed; config recorded in runs/<id>/train.diff).
+
+## Long-budget runs
+(not loop experiments; not committed; exact config in runs/<id>/train.diff. acc = clean val, threshold 0.5; Youden acc in brackets)
+| run | config | budget | epochs (steps) | proxy | iid | ood | unseen | acc all/iid/ood [Youden] | 6-min counterpart |
+|---|---|---|---|---|---|---|---|---|---|
+| r0028 | xception41 lr 3e-3 (r0019 cfg) | 30 min | 16 (1193) | 47.17 | 0.862 | 0.818 | 0.833 | 0.809/0.832/0.795 [0.813] | r0019: 4 ep (282), 51.49, 0.893/0.848/0.863, acc 0.826/0.838/0.818 [0.830] |
+- r0028: 4× the compute is WORSE on everything (-4.3 proxy; iid -0.031, ood -0.031, unseen -0.030). Final train loss 0.057 → overfits. The short cosine schedule is acting as early stopping, so we are NOT compute-limited at this data size (4.9k images); more epochs need more regularisation. Ens r0019+r0028 51.01 (corr 0.861) < r0019 alone.
