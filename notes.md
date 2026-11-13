@@ -95,3 +95,13 @@ Their recipe reimplemented from published hyperparameters only (patch: /tmp/ar_s
 - Caveats: (1) the 5th model adds +0.01, which is noise → stop at 3-4. (2) Selecting from ~35 runs on the same val overfits it: expect the real gain over a single model to be smaller than +0.6-0.7. (3) Without the lucky r0019 seed the best 4-ensemble is r0034+r0036+r0018+r0032 = 51.86, so ~0.35 of the headline is seed luck. Since configs are retrained, pick CONFIGS: xception41 lr3e-3 (≈4 ep) ×2 seeds + densenet121 ra lr3e-3 (≈5 ep) + B0 lr8e-3 with degrade aug (≈8 ep) is the robust reading of this table.
 - r0037 mixup α=0.2 (same pair/λ for both views) on consistency B0: 49.44, +0.13 vs r0024 (p=0.63) → reverted. Ens r0019+r0036+r0014+r0037 51.99 (< 52.08 without it). Loop resumed after the human-requested queue. Next: consistency_weight 3.0.
 - r0038 consistency_weight 3.0: 49.94, +0.63 vs r0024 (p=0.892) → seed-1 rerun r0039: 50.24, **+0.93 vs r0024 (p=0.950) → KEEP**; vs seed-matched r0025 +1.43 (p=0.998). Both seeds positive; iid 0.895/0.888, ood 0.826/0.835, worst 0.810/0.827. **B0 base = r0039 (consistency_weight 3.0).** B0 best 50.24, still below xception r0019 51.49. Ens r0019+r0036+r0014+r0039 52.01. Next: bracket with weight 6.0.
+- r0040 consistency_weight 6.0: 47.99, -2.24 vs r0039 (p=0.00) → reverted. Optimum ≈3.0 (1.0: 49.31/48.81, 3.0: 49.94/50.24, 6.0: 47.99). Only 277 steps (machine slow, 443 img/s), but -2.2 is too large to be that alone.
+
+### Summary after 40 runs (2026-11-13 21:35)
+- Best single model: r0019 xception41 lr 3e-3, 51.49 (seed-lucky: seeds 2-4 average 50.32). Best B0: r0039 (lr 8e-3, consistency w=3.0), 50.24. Best extra backbone: densenet121.ra lr 3e-3 (r0036), 50.05.
+- Best ensemble (greedy, see above): r0019+r0036+r0014+r0034 = 52.21; 3 models 52.08.
+- Biggest wins: lr (B0 3e-4→8e-3: +11.6; xception 1e-3→3e-3: +2.5), 6-min budget over 5 fixed epochs (+2.3), consistency training (+1 on B0), backbone diversity in the ensemble (+0.5-0.7).
+- What didn't help: cutout (×2), JPEG aug, mixup, longer training (all 3 configs), convnext_tiny, seresnext50, effnet_b2 (fine, but redundant with B0), Swin with their recipe (46.9).
+- Near misses (positive on both seeds, never KEEP): OneOf degrade aug (+0.96/+0.35), label smoothing 0.1 (+0.31/+0.59).
+- Weakest variants (r0019): pixelate 0.81, then noise05/webp30 ≈0.84; ood gap (iid 0.893 vs ood 0.848) is still the biggest lever.
+- Next: OneOf degrade aug p=0.4 on the r0039 base (single change); then label smoothing 0.1 on the new base.
