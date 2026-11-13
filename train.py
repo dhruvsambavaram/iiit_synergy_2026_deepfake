@@ -39,6 +39,7 @@ CONFIG = dict(
     weight_decay=0.05,
     warmup_epochs=0.5,
     label_smoothing=0.0,
+    mixup_alpha=0.2,                  # mixup (soft labels; same pair + lambda for both views)
     consistency_weight=1.0,           # EDD-style: BCE(clean)+BCE(degraded) + w*MSE(sigmoid(clean), sigmoid(degraded))
     num_workers=6,
 )
@@ -155,6 +156,9 @@ def main():
             for g in opt.param_groups: g["lr"] = lr_at(step, time.time() - t0)
             x, y = x.to(dev, non_blocking=True), y.to(dev)
             B = len(y)
+            if cfg["mixup_alpha"] > 0:
+                lam = float(np.random.beta(cfg["mixup_alpha"], cfg["mixup_alpha"])); perm = torch.randperm(B, device=x.device)
+                x = lam * x + (1 - lam) * x[perm]; y = lam * y + (1 - lam) * y[perm]
             logits = model(x.reshape(2 * B, *x.shape[2:])).reshape(B, 2)
             lc, ld = logits[:, 0], logits[:, 1]
             loss = loss_fn(lc, y) + loss_fn(ld, y) + cfg["consistency_weight"] * \
