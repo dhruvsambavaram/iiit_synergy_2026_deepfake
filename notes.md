@@ -110,3 +110,5 @@ Their recipe reimplemented from published hyperparameters only (patch: /tmp/ar_s
 - Next: label smoothing 0.1 on the r0039 base.
 - r0042 label smoothing 0.1 on w=3.0 base: 49.52, -0.72 vs r0039 (p=0.10), -0.42 vs r0038 → reverted. Label smoothing no longer helps once consistency is strong.
 - Next (ensemble candidate, not a base change): consistency w=3.0 on xception41 lr 3e-3; judged vs r0019 via ensemble_eval, reverted after.
+| r0043 | xception41 lr 3e-3 + consistency w=3.0 (ONLY 2 ep / 115 steps: two views at 140 s/epoch) | 46.23 | 50.42 (r0019+r0036+r0043: 51.27) | 0.880 |
+- r0043 is compute-starved (115 steps vs r0019's 282), so it tells us nothing about consistency on xception. PROPOSAL for the human: an epoch-matched test (`./run_experiment.sh "..." 4`, ≈12 min, i.e. 2× the loop budget) before the final retrain. Not run, because the loop must not raise the budget.
