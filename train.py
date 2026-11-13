@@ -32,7 +32,8 @@ from common import MEAN, STD, SPLITS, IMAGE_SIZE
 CONFIG = dict(
     arch="efficientnet_b0.ra_in1k",   # any timm ImageNet-pretrained model
     drop_rate=0.2,
-    epochs=5,
+    time_budget_min=6.0,              # fixed wall-clock training budget (Karpathy-style); --epochs overrides
+    epochs=None,
     batch_size=64,
     lr=3e-4,
     weight_decay=0.05,
@@ -103,21 +104,33 @@ def main():
     build_kwargs = dict(arch=cfg["arch"], drop_rate=cfg["drop_rate"])
     model = build_model(**build_kwargs, pretrained=True).to(dev)
     opt = torch.optim.AdamW(model.parameters(), lr=cfg["lr"], weight_decay=cfg["weight_decay"])
-    total = cfg["epochs"] * len(dl); warm = int(cfg["warmup_epochs"] * len(dl))
-    sched = torch.optim.lr_scheduler.LambdaLR(
-        opt, lambda s: (s + 1) / max(1, warm) if s < warm else 0.5 * (1 + math.cos(math.pi * (s - warm) / max(1, total - warm))))
+    # Schedule: progress p in [0,1] is wall-clock based (time budget) or step based (--epochs, final runs).
+    budget_s = None if cfg["epochs"] else cfg["time_budget_min"] * 60
+    total_steps = cfg["epochs"] * len(dl) if cfg["epochs"] else None
+    warm_steps = int(cfg["warmup_epochs"] * len(dl))
+
+    def lr_at(step, elapsed):
+        if step < warm_steps:
+            return cfg["lr"] * (step + 1) / max(1, warm_steps)
+        p = elapsed / budget_s if budget_s else step / total_steps
+        return cfg["lr"] * 0.5 * (1 + math.cos(math.pi * min(1.0, p)))
 
     log = {"config": cfg, "seed": args.seed, "full": args.full, "n_train": len(ds), "epochs": []}
-    t0 = time.time()
-    for ep in range(cfg["epochs"]):
+    t0, step, ep, done = time.time(), 0, 0, False
+    while not done:
         model.train(); tl, n, te = 0.0, 0, time.time()
         for x, y in dl:
+            for g in opt.param_groups: g["lr"] = lr_at(step, time.time() - t0)
             x, y = x.to(dev, non_blocking=True), y.to(dev)
             loss = loss_fn(model(x).reshape(-1), y)
-            opt.zero_grad(set_to_none=True); loss.backward(); opt.step(); sched.step()
+            opt.zero_grad(set_to_none=True); loss.backward(); opt.step(); step += 1
             tl += loss.item() * len(y); n += len(y)
-        log["epochs"].append({"epoch": ep + 1, "loss": tl / n, "sec": time.time() - te})
-        print(f"[train] epoch {ep + 1}/{cfg['epochs']} loss={tl / n:.4f} ({time.time() - te:.0f}s)", flush=True)
+            if budget_s and time.time() - t0 >= budget_s:
+                done = True; break
+        ep += 1
+        if cfg["epochs"] and ep >= cfg["epochs"]: done = True
+        log["epochs"].append({"epoch": ep, "loss": tl / max(1, n), "sec": time.time() - te, "steps": step})
+        print(f"[train] epoch {ep} loss={tl / max(1, n):.4f} ({time.time() - te:.0f}s, step {step})", flush=True)
     log["train_seconds"] = time.time() - t0
 
     torch.save({"state_dict": model.state_dict(), "build_kwargs": build_kwargs, "config": cfg}, run_dir / "model.pt")

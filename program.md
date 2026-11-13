@@ -20,9 +20,14 @@ auc_rob  = 0.4·mean AUC(seen corruptions) + 0.6·mean AUC(unseen corruptions)
    center-crop-zoom, median filter, the downscale+JPEG "social" chain. Those measure true generalisation.
 5. Model contract: `build_model(**build_kwargs)` gets ImageNet-normalised 224×224 input, returns fake-logits. TTA must live inside the model.
    Guards (auto-checked): ≤150M params, ≤600 MB checkpoint, ≥100 img/s inference on this machine.
-6. Screening budget: ≤ 6 epochs and ≤ 10 min training per experiment unless the human says otherwise.
+6. Screening budget (Karpathy-style fixed compute): **6 minutes of training wall-clock** per experiment, so backbones are compared at
+   equal compute. Set `CONFIG["time_budget_min"]` (train.py stops at the end of the epoch that crosses it and the cosine schedule is
+   sized from a measured epoch time). Never raise it in the loop.
+7. Models must stay expressible as `timm.create_model(arch, num_classes=1, drop_rate=…)` + optional TTA flag, because the
+   submission `inference_script.py` rebuilds them that way. If you need a custom head, write it in notes.md as a proposal instead.
 
 ## The loop
+0. Once per session: `git checkout -b autoresearch/<date>-<n>` from the current best commit (keeps runs per session separable).
 1. Read `results.tsv` (all rows) and `git log --oneline -20`. Look at `runs/<best>/metrics.json` per-variant AUCs to find the weakest variants / ood gap.
 2. Write ONE hypothesis, grounded in the evidence (e.g. "worst variant is gblur2 at 0.81 → add blur aug p=0.3").
    Change one thing at a time unless combining two individually-validated KEEPs.
