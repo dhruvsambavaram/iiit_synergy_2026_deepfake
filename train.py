@@ -38,7 +38,7 @@ CONFIG = dict(
     lr=8e-3,
     weight_decay=0.05,
     warmup_epochs=0.5,
-    label_smoothing=0.0,
+    label_smoothing=0.1,
     consistency_weight=3.0,           # EDD-style: BCE(clean)+BCE(degraded) + w*MSE(sigmoid(clean), sigmoid(degraded))
     num_workers=6,
 )
