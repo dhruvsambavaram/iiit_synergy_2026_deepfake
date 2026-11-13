@@ -81,9 +81,7 @@ class PairTF:
 
     def __call__(self, img):
         img = self.geo(img)
-        d = degrade(img)
-        if random.random() < 0.5: d = degrade(d)          # chain a 2nd seen corruption (organisers stack degradations)
-        return torch.stack([self.tt(img), self.tt(d)])
+        return torch.stack([self.tt(img), self.tt(degrade(img))])
 
 
 def train_transforms():
