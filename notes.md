@@ -17,3 +17,4 @@
 - Seed spread ≈ 1 pt.
 - Next: retest cutout at lr 8e-3, then JPEG aug, then blur/pixelate aug (aimed at pixelate and gblur2).
 - r0011 cutout p=0.5 @ lr 8e-3: DISCARD 47.95 (-0.40, p=0.26). iid +0.008 but ood -0.012. Cutout doesn't help at either lr, so drop it. Next: JPEG q U(30,95) p=0.5.
+- r0012 JPEG q U(30,95) p=0.5: DISCARD 47.35 (-1.00, p=0.07). jpeg30 is unchanged and ood -0.016. CPU aug also cost ~4% of steps. Generic degradation augs aren't paying off so far; high lr is already regularising. Next: OneOf(blur/noise/downup/pixelate) p=0.4, aimed at pixelate and gblur2.
