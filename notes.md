@@ -131,3 +131,5 @@ Their recipe reimplemented from published hyperparameters only (patch: /tmp/ar_s
 - r0052/r0053 weight_decay 0.1: 50.93 (+0.69 vs r0039, p=0.87; +0.99 vs r0038, p=0.98) / 50.50 (+0.27 vs r0039, p=0.74) → not KEEP, reverted.
 - PATTERN: four near-misses on the w=3 base, each positive on both seeds (2-seed mean vs the base): wd 0.1 +0.48, ramp-up+lr6e-3 +0.50, label smoothing 0.1 (at w=1) +0.45, degrade aug (at w=1) +0.66. None reaches p≥0.90 alone. PROPOSAL (needs a human OK, since program.md only allows combining validated KEEPs): one combined run of ramp-up + lr 6e-3 + wd 0.1 at 2 seeds.
 - Next: warmup 1.0 epoch at lr 8e-3 (r0003 tested warmup only at lr 1e-4).
+- r0054 warmup 1.0 ep at lr 8e-3: 50.21, -0.02 vs r0039, +0.27 vs r0038 → neutral, reverted. B0 hyperparameters look exhausted at this budget.
+- Next: densenet121 lr 3e-3 seeds 1 and 2 (r0036 is the top ensemble partner but a single seed; check it isn't seed-lucky like r0019).
