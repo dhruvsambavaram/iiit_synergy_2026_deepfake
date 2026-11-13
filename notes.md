@@ -7,3 +7,12 @@
 - r0006 lr 2e-3 seed0: INCONCLUSIVE 43.83 (+0.40, p=0.68), pixelate 0.585→0.697. r0007 seed1 rerun: KEEP 44.80 (+1.36, p=0.91). Seed spread ≈1 pt → best may be slightly seed-lucky (winner's curse); treat small deltas skeptically. Next: lr 4e-3 once to bracket, then move on to JPEG aug / retest cutout.
 - r0008 lr 4e-3: KEEP 46.36 (+1.56, p=0.92). ood 0.803 (+0.025), pixelate 0.74. High lr seems to regularise (flatter minima) in this overfit regime. Next: lr 8e-3.
 - r0009 lr 8e-3: KEEP 48.35 (+2.00, p=0.97). ood 0.825, pixelate 0.80. Final train loss 0.39 (vs 0.03 at 1e-3), so the overfit is gone. Stable curve. Next: lr 1.2e-2 (smaller step near the edge); if it plateaus, retest cutout/JPEG aug at the new lr.
+- r0010 lr 1.2e-2: DISCARD 44.66 (-3.69). Past the edge; lr optimum ≈ 8e-3 for B0/AdamW/bs64 in 6 min.
+
+### Summary after 10 runs (2026-11-13 15:15)
+- Best: r0009 (lr 8e-3, effnet-b0, flip+light RRC, 6-min budget), proxy 48.35 (iid 0.876, ood 0.825, seen 0.831, unseen 0.836).
+- Biggest wins: lr sweep 3e-4 → 8e-3 (+11.6 total over the rebaseline); the 6-min budget itself gave +2.3 over 5 epochs. Higher lr removed the overfit (train loss 0.03 → 0.39).
+- Failed: lr 1e-4 (underfit), cutout at lr 3e-4 (-1.75, may not hold now that the regime has changed), lr 1.2e-2.
+- Weakest variants now: pixelate 0.80, gblur2 0.82, then webp30/color/gamma/noise05/gray ≈ 0.83. The variants are now fairly uniform; the ood gap (0.876 vs 0.825) is the bigger target.
+- Seed spread ≈ 1 pt.
+- Next: retest cutout at lr 8e-3, then JPEG aug, then blur/pixelate aug (aimed at pixelate and gblur2).
