@@ -22,7 +22,7 @@ import pandas as pd
 import timm
 import torch
 import torch.nn as nn
-from PIL import Image
+from PIL import Image, ImageEnhance, ImageFilter
 from torch.utils.data import DataLoader, Dataset
 from torchvision.transforms import v2 as T
 
@@ -39,6 +39,7 @@ CONFIG = dict(
     weight_decay=0.05,
     warmup_epochs=0.5,
     label_smoothing=0.0,
+    consistency_weight=1.0,           # EDD-style: BCE(clean)+BCE(degraded) + w*MSE(sigmoid(clean), sigmoid(degraded))
     num_workers=6,
 )
 
@@ -47,13 +48,44 @@ def build_model(arch, drop_rate=0.0, pretrained=False):
     return timm.create_model(arch, pretrained=pretrained, num_classes=1, drop_rate=drop_rate)
 
 
+def degrade(img):
+    """ONE random SEEN corruption (common.py 'seen' types only; no WebP/motion/gamma/posterize/median/crop-zoom/social)."""
+    k = random.randrange(8); w, h = img.size
+    if k == 0: return img.filter(ImageFilter.GaussianBlur(random.uniform(0.5, 2.0)))
+    if k == 1:
+        a = np.asarray(img).astype(np.float32)
+        a = a + np.random.normal(0, random.uniform(0.01, 0.05) * 255, a.shape)
+        return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8))
+    if k in (2, 3):
+        s = random.uniform(0.4, 0.9) if k == 2 else random.uniform(0.2, 0.5)
+        rs = Image.BILINEAR if k == 2 else Image.NEAREST
+        return img.resize((max(8, int(w * s)), max(8, int(h * s))), rs).resize((w, h), rs)
+    if k == 4:
+        buf = io.BytesIO(); img.save(buf, "JPEG", quality=random.randint(30, 95)); buf.seek(0)
+        return Image.open(buf).convert("RGB")
+    if k == 5: return img.convert("L").convert("RGB")
+    if k == 6:
+        img = ImageEnhance.Brightness(img).enhance(random.uniform(0.6, 1.4))
+        return ImageEnhance.Contrast(img).enhance(random.uniform(0.5, 1.3))
+    a = np.asarray(img).copy(); s = int(random.uniform(0.10, 0.30) * w)
+    x, y = random.randint(0, w - s), random.randint(0, h - s)
+    a[y:y + s, x:x + s] = random.choice([0, 128, 255]); return Image.fromarray(a)
+
+
+class PairTF:
+    """Same geometry for both views; returns stacked (2,3,H,W): [clean, degraded]."""
+    def __init__(self):
+        self.geo = T.Compose([T.RandomHorizontalFlip(),
+                              T.RandomResizedCrop(IMAGE_SIZE, scale=(0.85, 1.0), ratio=(0.95, 1.05), antialias=True)])
+        self.tt = T.Compose([T.ToImage(), T.ToDtype(torch.float32, scale=True), T.Normalize(MEAN, STD)])
+
+    def __call__(self, img):
+        img = self.geo(img)
+        return torch.stack([self.tt(img), self.tt(degrade(img))])
+
+
 def train_transforms():
-    return T.Compose([
-        T.RandomHorizontalFlip(),
-        T.RandomResizedCrop(IMAGE_SIZE, scale=(0.85, 1.0), ratio=(0.95, 1.05), antialias=True),
-        T.ToImage(), T.ToDtype(torch.float32, scale=True),
-        T.Normalize(MEAN, STD),
-    ])
+    return PairTF()
 
 
 def loss_fn(logits, y):
@@ -122,7 +154,11 @@ def main():
         for x, y in dl:
             for g in opt.param_groups: g["lr"] = lr_at(step, time.time() - t0)
             x, y = x.to(dev, non_blocking=True), y.to(dev)
-            loss = loss_fn(model(x).reshape(-1), y)
+            B = len(y)
+            logits = model(x.reshape(2 * B, *x.shape[2:])).reshape(B, 2)
+            lc, ld = logits[:, 0], logits[:, 1]
+            loss = loss_fn(lc, y) + loss_fn(ld, y) + cfg["consistency_weight"] * \
+                nn.functional.mse_loss(torch.sigmoid(lc), torch.sigmoid(ld))
             opt.zero_grad(set_to_none=True); loss.backward(); opt.step(); step += 1
             tl += loss.item() * len(y); n += len(y)
             if budget_s and time.time() - t0 >= budget_s:
