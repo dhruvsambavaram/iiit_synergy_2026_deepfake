@@ -47,3 +47,5 @@
 - r0025 consistency seed1: 48.81 (+0.46 vs r0009). Ensembles: r0024+r0025 49.94; r0019+r0020+r0025 51.55.
 - Verdict fix: since best.json → r0019 (xception), harness verdicts for B0 runs are vs xception and meaningless. I re-ran the same paired bootstrap vs r0009 (scratch script /tmp/ar_scratch/p_vs.py, reads only val_preds, matches harness p-values exactly). r0024 vs r0009: +0.96, p=0.908 → KEEP by the program's rule. **Consistency stays in train.py; B0 base = r0024.** (r0013 degrade aug was p=0.884, just short.) B0 runs from here are judged vs r0024 this way.
 - Next (ladder 3, label noise): label smoothing 0.1 on top of consistency.
+- r0026/r0027 label smoothing 0.1 on consistency B0: +0.31 (p=0.67) / +0.59 (p=0.83) vs r0024; vs seed-matched r0025 the seed-1 run is +1.09 (p=0.96). Positive on both seeds but not KEEP vs base → reverted. Likely a small real gain; a candidate to fold in for the final stage. Ens r0019+r0020+r0027: 51.79.
+- 2026-11-13 ~18:00: HUMAN OVERRIDE — ladder paused; architecture pool fixed (xception41 + B0). Running 3 long-budget runs (not loop experiments, not committed; config recorded in runs/<id>/train.diff).
