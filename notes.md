@@ -71,5 +71,11 @@ Their recipe reimplemented from published hyperparameters only (patch: /tmp/ar_s
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | A rs_swin_theirs | swin_tiny, their recipe | theirs (8.4% leak) | 10 | 16.1 | **0.9248** | 0.8886 | 0.8914 | — | — | — | — | — |
 | B r0031 | swin_tiny, their recipe | ours | 10 | 14.4 | — | 0.797 (iid 0.838 / ood 0.772) | Youden 0.803 | 0.882 | 0.799 | 0.823 | 0.737 (pixelate) | 46.91 |
+| C rs_xception | xception41 lr 3e-3, our recipe (r0019 cfg) | theirs (8.4% leak) | 3 (252 steps) | 6.0 | 0.9154 | 0.8821 | 0.8843 | — | — | — | — | — |
 | r0019 (ref) | xception41 lr 3e-3, our recipe | ours | 4 | 6.0 | — | 0.826 (iid 0.838 / ood 0.818) | Youden 0.830 | 0.893 | 0.848 | 0.863 | 0.812 (pixelate) | 51.49 |
 - A matches their 0.927 → our reimplementation and data pipeline agree with theirs. B: on our harness their recipe is -4.58 vs r0019, mainly ood (-0.049) and corruption robustness (worst 0.737). Same iid acc (0.838) as r0019 → the gap is generalisation to unseen domains. Ens r0019+r0031 51.31 (corr 0.836) < r0019; r0019+r0020+r0031 51.86; r0019+r0024+r0031 51.96. The Swin ensemble candidate is covered by B → skip a separate Swin run.
+- C: on THEIR split our 6-min xception (3 ep) gets 0.915 vs their Swin 0.925 (10 ep, 16 min, 2.7× compute). On OUR harness the ranking flips (r0019 51.49 vs r0031 46.91). Their random split rewards iid fit (8.4% near-dup leak); our ood/corruption harness rewards robustness. Their 0.92s are not comparable to our val numbers.
+| r0032 | xception41 r0019 cfg seed 2 (3 ep, 196 steps) | 50.19 | 51.80 | 0.921 |
+| r0033 | xception41 r0019 cfg seed 3 (4 ep, 250 steps) | 49.92 | 51.56 | 0.926 |
+| r0034 | xception41 r0019 cfg seed 4 (4 ep, 247 steps) | 50.84 | 51.80 | 0.934 |
+- Seeds 2-4: mean 50.32 vs r0019 51.49 → r0019 was ~1.2 pt seed-lucky (winner's curse, as suspected). The step count also varies with machine speed (196-282 steps in the same 6 min), another reason the final retrain should use fixed EPOCHS.
