@@ -47,21 +47,10 @@ def build_model(arch, drop_rate=0.0, pretrained=False):
     return timm.create_model(arch, pretrained=pretrained, num_classes=1, drop_rate=drop_rate)
 
 
-class RandomJPEG:
-    """Re-encode as JPEG (only JPEG; WebP is a held-out eval corruption) with quality U(lo, hi)."""
-    def __init__(self, p=0.5, lo=30, hi=95): self.p, self.lo, self.hi = p, lo, hi
-
-    def __call__(self, img):
-        if random.random() >= self.p: return img
-        buf = io.BytesIO(); img.save(buf, "JPEG", quality=random.randint(self.lo, self.hi)); buf.seek(0)
-        return Image.open(buf).convert("RGB")
-
-
 def train_transforms():
     return T.Compose([
         T.RandomHorizontalFlip(),
         T.RandomResizedCrop(IMAGE_SIZE, scale=(0.85, 1.0), ratio=(0.95, 1.05), antialias=True),
-        RandomJPEG(p=0.5),
         T.ToImage(), T.ToDtype(torch.float32, scale=True),
         T.Normalize(MEAN, STD),
     ])
