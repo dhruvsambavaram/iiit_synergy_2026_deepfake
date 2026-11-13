@@ -27,3 +27,4 @@
 | r0008 | B0 lr 4e-3 | 46.36 | 49.62 | 0.815 |
 | r0013 | B0 lr 8e-3 + OneOf degrade p=0.4 | 49.31 | 50.01 | 0.904 |
 | r0015 | effnet_b2 lr 4e-3 (5 ep) | 48.00 | 49.96 | 0.841 |
+| r0016 | effnet_b2 lr 8e-3 (4 ep; machine slower, 83 s/ep) | 48.45 | 49.44 | 0.892 |
