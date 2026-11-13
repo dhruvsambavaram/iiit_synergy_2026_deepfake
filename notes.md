@@ -34,3 +34,6 @@
 | r0019 | xception41 tf_in1k lr 3e-3 (~3.9 ep / 282 steps) | **51.49** (best single model) | 51.44 (ens doesn't beat it alone) | 0.879 |
 | r0009+r0018+r0019 | 3-way | — | 51.58 | — |
 - r0019 got verdict KEEP vs r0009 (+3.14, p=1.0), so the harness set best.json → r0019. train.py is restored to B0 per instructions, but later B0 verdicts are now relative to xception; judge B0 runs by delta vs r0009 via ensemble_eval. Xception lr is still climbing → trying 6e-3 (3rd sweep point).
+| r0020 | xception41 lr 6e-3 (~3.5 ep) | 50.64 | 50.75 | 0.889 |
+| r0019+r0020 | two xception lrs | — | **51.88** (best ensemble so far) | 0.934 |
+- Xception lr optimum ≈ 3e-3 (1e-3: 48.99, 3e-3: 51.49, 6e-3: 50.64). Next: seresnext50 lr 1e-3 / 3e-3.
