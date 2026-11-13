@@ -1,3 +1,4 @@
 - r0001 baseline B0: proxy 34.5, val AUC iid 0.81 / ood 0.70, but train AUC 0.99 → heavy overfit (pipeline verified by tools/sanity_gap.py). Collapses on pixelate (0.52) and noise05 (0.58). Epoch-1 loss 1.96 is suspiciously high → try lower lr / longer warmup first.
 - 2026-11-13: switched train.py to a fixed 6-min wall-clock budget (Karpathy-style). r0001 used 5 fixed epochs (3.4 min), so FIRST loop run = unchanged config under the time budget (re-baseline), THEN the lr/warmup hypothesis.
 - r0002 rebaseline (6-min budget, 9 epochs vs 5): KEEP proxy 36.76 (+2.29). iid 0.826 / ood 0.717. Still worst on pixelate (0.55) and noise05. Next: lr 1e-4 + warmup 1.0.
+- r0003 lr 1e-4 + warmup 1.0: DISCARD 31.16 (-5.60). Underfits (final loss 0.31 vs 0.07); high ep-1 loss was just warmup, not instability. Higher lr (1e-3) is the more promising direction; queue after cutout.
