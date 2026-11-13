@@ -44,3 +44,6 @@
 - convnext_tiny: both lrs weak on ood (0.79/0.77) and it hurts every xception ensemble → dropped for good.
 - r0024 EDD consistency on B0 (clean+degraded views, BCE both + 1.0·MSE): 49.31 = +0.96 vs r0009 (harness verdict DISCARD is vs xception r0019, so ignore it). Only 318 steps (half of B0's), so the gain comes despite half the updates. iid 0.881 / ood 0.832. Rerunning seed 1.
 | r0024 | B0 consistency (5 ep, 318 steps) | 49.31 | 49.72 (w/ r0019: 51.85; **r0019+r0020+r0024: 51.97**, best) | 0.916 |
+- r0025 consistency seed1: 48.81 (+0.46 vs r0009). Ensembles: r0024+r0025 49.94; r0019+r0020+r0025 51.55.
+- Verdict fix: since best.json → r0019 (xception), harness verdicts for B0 runs are vs xception and meaningless. I re-ran the same paired bootstrap vs r0009 (scratch script /tmp/ar_scratch/p_vs.py, reads only val_preds, matches harness p-values exactly). r0024 vs r0009: +0.96, p=0.908 → KEEP by the program's rule. **Consistency stays in train.py; B0 base = r0024.** (r0013 degrade aug was p=0.884, just short.) B0 runs from here are judged vs r0024 this way.
+- Next (ladder 3, label noise): label smoothing 0.1 on top of consistency.
