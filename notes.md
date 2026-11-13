@@ -16,3 +16,4 @@
 - Weakest variants now: pixelate 0.80, gblur2 0.82, then webp30/color/gamma/noise05/gray ≈ 0.83. The variants are now fairly uniform; the ood gap (0.876 vs 0.825) is the bigger target.
 - Seed spread ≈ 1 pt.
 - Next: retest cutout at lr 8e-3, then JPEG aug, then blur/pixelate aug (aimed at pixelate and gblur2).
+- r0011 cutout p=0.5 @ lr 8e-3: DISCARD 47.95 (-0.40, p=0.26). iid +0.008 but ood -0.012. Cutout doesn't help at either lr, so drop it. Next: JPEG q U(30,95) p=0.5.
