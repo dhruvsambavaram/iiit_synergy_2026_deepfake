@@ -56,3 +56,5 @@
 |---|---|---|---|---|---|---|---|---|---|
 | r0028 | xception41 lr 3e-3 (r0019 cfg) | 30 min | 16 (1193) | 47.17 | 0.862 | 0.818 | 0.833 | 0.809/0.832/0.795 [0.813] | r0019: 4 ep (282), 51.49, 0.893/0.848/0.863, acc 0.826/0.838/0.818 [0.830] |
 - r0028: 4× the compute is WORSE on everything (-4.3 proxy; iid -0.031, ood -0.031, unseen -0.030). Final train loss 0.057 → overfits. The short cosine schedule is acting as early stopping, so we are NOT compute-limited at this data size (4.9k images); more epochs need more regularisation. Ens r0019+r0028 51.01 (corr 0.861) < r0019 alone.
+| r0029 | B0 consistency lr 8e-3 (r0024 cfg) | 25 min | 18 (1322) | 46.63 | 0.870 | 0.806 | 0.824 | 0.780/0.813/0.759 [0.801] | r0024: 5 ep (318), 49.31, 0.881/0.832/0.843, acc 0.782/0.822/0.757 [0.801] |
+- r0029: also worse (-2.68; ood -0.027). Loss drops steadily to 0.13 (the two-view sum, so ≈0.06 per view) → overfits after ~5-8 epochs even with consistency. Ens r0024+r0029 50.02 (corr 0.817).
