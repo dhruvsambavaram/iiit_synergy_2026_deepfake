@@ -133,3 +133,6 @@ Their recipe reimplemented from published hyperparameters only (patch: /tmp/ar_s
 - Next: warmup 1.0 epoch at lr 8e-3 (r0003 tested warmup only at lr 1e-4).
 - r0054 warmup 1.0 ep at lr 8e-3: 50.21, -0.02 vs r0039, +0.27 vs r0038 → neutral, reverted. B0 hyperparameters look exhausted at this budget.
 - Next: densenet121 lr 3e-3 seeds 1 and 2 (r0036 is the top ensemble partner but a single seed; check it isn't seed-lucky like r0019).
+| r0055 | densenet121.ra lr 3e-3 (r0036 cfg) seed 1 | 50.42 | **52.02** (r0019+r0036+r0055: 52.04; r0019+r0055+r0051: 52.21) | 0.905 |
+- r0055: DenseNet seed 1 (50.42) ≥ seed 0 (50.05) and pairs with r0019 just as well (52.02 vs 51.95) → r0036 was NOT seed-lucky; DenseNet is a reliable 2nd model. r0056 (seed 2) was killed mid-training when the human stopped the loop: no results row, ignore runs/r0056.
+- **LOOP STOPPED by the human, 2026-11-13 ~23:50, after 55 runs.** train.py == r0039 config (B0, lr 8e-3, consistency w=3.0, 6-min budget).
