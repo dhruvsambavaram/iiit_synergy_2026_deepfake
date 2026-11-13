@@ -47,26 +47,9 @@ def build_model(arch, drop_rate=0.0, pretrained=False):
     return timm.create_model(arch, pretrained=pretrained, num_classes=1, drop_rate=drop_rate)
 
 
-class RandomBoxes:
-    """Organiser-style occlusion: 1-2 boxes (side 10-35% of width, aspect 0.5-2) filled black/gray/white."""
-    def __init__(self, p=0.5): self.p = p
-
-    def __call__(self, img):
-        if random.random() >= self.p: return img
-        a = np.asarray(img).copy(); h, w = a.shape[:2]
-        for _ in range(random.choice([1, 1, 2])):
-            s = random.uniform(0.10, 0.35) * w; r = random.uniform(0.5, 2.0)
-            bw, bh = max(4, int(s * math.sqrt(r))), max(4, int(s / math.sqrt(r)))
-            bw, bh = min(bw, w - 1), min(bh, h - 1)
-            x, y = random.randint(0, w - bw), random.randint(0, h - bh)
-            a[y:y + bh, x:x + bw] = random.choice([0, 128, 255])
-        return Image.fromarray(a)
-
-
 def train_transforms():
     return T.Compose([
         T.RandomHorizontalFlip(),
-        RandomBoxes(p=0.5),
         T.RandomResizedCrop(IMAGE_SIZE, scale=(0.85, 1.0), ratio=(0.95, 1.05), antialias=True),
         T.ToImage(), T.ToDtype(torch.float32, scale=True),
         T.Normalize(MEAN, STD),
