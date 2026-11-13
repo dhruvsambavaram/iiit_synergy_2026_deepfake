@@ -52,9 +52,15 @@ Never stop to ask the human; keep looping until interrupted.
 
 ## Research ladder (rough priority; evidence overrides it)
 1. **Baseline calibration**: lr (1e-4 / 3e-4 / 1e-3), epochs (5 vs 8 is a later full-run question), drop_rate.
-2. **Degradation-aware augmentation** (DFDC winner / NTechLab style): random JPEG(q 30–95), gaussian blur, gaussian noise,
-   down/up-scale, cutout boxes, grayscale, color jitter — each with p≈0.2–0.5. Add one family at a time, then combine KEEPs.
-3. **Regularisation for label noise**: label smoothing 0.05–0.1, mixup/cutmix (soft labels), stochastic depth.
+2. **Degradation-aware augmentation** (DFDC 1st/3rd/5th place; see github.com/SlongLiu/collection_dfdc). Try in this order, one per run:
+   a. Random erasing / cutout boxes filled gray/black/white/noise (p≈0.5) — mirrors the organisers' occlusion boxes.
+   b. Random JPEG re-compression, quality U(30, 95), p≈0.5 — JPEG ONLY (WebP is a held-out eval corruption).
+   c. Gaussian blur σ∈[0.5,2] / gaussian noise σ∈[0.01,0.05] / down-up-scale 0.4–0.9 / pixelate, p≈0.2–0.3 each.
+   d. RandAugment or TrivialAugmentWide with **posterize and solarize removed** (posterize is held-out); small rotate/shear only (faces are aligned).
+   e. Grayscale p≈0.1, color jitter.
+   Then combine the KEEPs. Watch the train-vs-val gap (tools/sanity_gap.py): baseline is 0.99 train vs 0.74 val AUC.
+3. **Regularisation for label noise**: label smoothing 0.05–0.1, mixup/cutmix (soft labels; NTechLab used mixup), stochastic depth.
+   (Real/fake *pair* mixup is not worth it: only ~74 same-source pairs exist.)
 4. **Consistency training** (EDD-style): loss on clean + degraded views of the same image, plus a KL/MSE term between their
    predictions; optionally an EMA "mean teacher".
 5. **Backbones** (diversity for the final ensemble): convnext_tiny, efficientnet_b2, resnet50, tf_efficientnetv2_s, a small ViT/Swin.
