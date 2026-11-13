@@ -37,3 +37,4 @@
 | r0020 | xception41 lr 6e-3 (~3.5 ep) | 50.64 | 50.75 | 0.889 |
 | r0019+r0020 | two xception lrs | — | **51.88** (best ensemble so far) | 0.934 |
 - Xception lr optimum ≈ 3e-3 (1e-3: 48.99, 3e-3: 51.49, 6e-3: 50.64). Next: seresnext50 lr 1e-3 / 3e-3.
+| r0021 | seresnext50 racm lr 1e-3 (~3.2 ep; pixelate 0.67) | 46.85 | 49.37 (w/ r0019: 51.20; r0019+r0020+r0021: 51.72) | 0.838 |
