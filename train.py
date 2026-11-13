@@ -48,9 +48,9 @@ def build_model(arch, drop_rate=0.0, pretrained=False):
     return timm.create_model(arch, pretrained=pretrained, num_classes=1, drop_rate=drop_rate)
 
 
-def degrade(img, allowed=tuple(range(8))):
+def degrade(img):
     """ONE random SEEN corruption (common.py 'seen' types only; no WebP/motion/gamma/posterize/median/crop-zoom/social)."""
-    k = random.choice(allowed); w, h = img.size
+    k = random.randrange(8); w, h = img.size
     if k == 0: return img.filter(ImageFilter.GaussianBlur(random.uniform(0.5, 2.0)))
     if k == 1:
         a = np.asarray(img).astype(np.float32)
@@ -82,8 +82,7 @@ class PairTF:
     def __call__(self, img):
         img = self.geo(img)
         d = degrade(img)
-        if random.random() < 0.5:   # chain a 2nd seen corruption; never resize/pixelate/JPEG (no "social" downscale+JPEG chain)
-            d = degrade(d, allowed=(0, 1, 5, 6, 7))
+        if random.random() < 0.5: d = degrade(d)          # chain a 2nd seen corruption (organisers stack degradations)
         return torch.stack([self.tt(img), self.tt(d)])
 
 
