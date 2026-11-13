@@ -3,3 +3,4 @@
 - r0002 rebaseline (6-min budget, 9 epochs vs 5): KEEP proxy 36.76 (+2.29). iid 0.826 / ood 0.717. Still worst on pixelate (0.55) and noise05. Next: lr 1e-4 + warmup 1.0.
 - r0003 lr 1e-4 + warmup 1.0: DISCARD 31.16 (-5.60). Underfits (final loss 0.31 vs 0.07); high ep-1 loss was just warmup, not instability. Higher lr (1e-3) is the more promising direction; queue after cutout.
 - r0004 cutout boxes p=0.5 (1-2 boxes, 10-35% side): DISCARD 35.01 (-1.75). iid flat, ood -0.025; even the cutout variant didn't improve much. Model is underfitting-in-budget rather than lacking occlusion invariance? Next: lr 1e-3 (ladder 1), then JPEG aug.
+- r0005 lr 1e-3: KEEP 43.43 (+6.68!). iid 0.877 / ood 0.762, all variants up. lr was the main bottleneck in a 6-min budget. Next: lr 2e-3 to find the edge; retest cutout later (r0004 may have failed because the model was underfit at lr 3e-4).

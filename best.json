@@ -1,5 +1,5 @@
 {
- "run_id": "r0002",
- "proxy": 36.757662340426066,
- "preds": "runs/r0002/val_preds.npz"
+ "run_id": "r0005",
+ "proxy": 43.432900658617065,
+ "preds": "runs/r0005/val_preds.npz"
 }
