@@ -42,3 +42,4 @@ time	run_id	verdict	proxy	delta	p_better	auc_main	auc_iid	auc_ood	auc_seen	auc_u
 2026-11-13 21:43	r0041	DISCARD	49.1119	-2.3826	0.0000	0.8551	0.8775	0.8328	0.8370	0.8419	0.7937	pixelate	4.0088	16.3065	537.1702	6.0183	OneOf degrade p=0.4 on consistency w=3.0 base
 2026-11-13 21:52	r0042	DISCARD	49.5181	-1.9764	0.0060	0.8581	0.8932	0.8229	0.8408	0.8441	0.8116	pixelate	4.0088	16.3065	538.1184	6.0078	label smoothing 0.1 on consistency w=3.0 base
 2026-11-13 22:03	r0043	DISCARD	46.2255	-5.2690	0.0000	0.8342	0.8690	0.7994	0.8166	0.8226	0.7766	pixelate	24.9226	100.3076	196.9614	6.0486	ens-cand: xception41 lr 3e-3 + consistency w=3.0
+2026-11-13 22:13	r0044	DISCARD	45.8783	-5.6162	0.0000	0.8319	0.8636	0.8002	0.8154	0.8183	0.7876	pixelate	4.0088	16.3065	550.7186	6.0161	degraded view: chain 2nd seen corruption p=0.5 (no resize/JPEG in 2nd)
