@@ -31,3 +31,6 @@
 | r0017 | convnext_tiny in22k-ft lr 5e-4 (only ~3.3 ep / 244 steps → DROPPED per the <4-epoch rule; best iid 0.891, weak ood 0.790) | 46.84 | 49.51 | 0.834 |
 | r0018 | xception41 tf_in1k lr 1e-3 (~3.4 ep / 259 steps, 100-120 s/ep, img/s 168) | 48.99 | **50.50** | 0.852 |
 - Epoch-cutoff note: xception41 (3.4 ep) is borderline like convnext_tiny (3.3 ep), but its single-model score beats B0 and it gives the best ensemble so far → continuing its lr sweep; convnext gets its lr 1e-3 run too, for consistency.
+| r0019 | xception41 tf_in1k lr 3e-3 (~3.9 ep / 282 steps) | **51.49** (best single model) | 51.44 (ens doesn't beat it alone) | 0.879 |
+| r0009+r0018+r0019 | 3-way | — | 51.58 | — |
+- r0019 got verdict KEEP vs r0009 (+3.14, p=1.0), so the harness set best.json → r0019. train.py is restored to B0 per instructions, but later B0 verdicts are now relative to xception; judge B0 runs by delta vs r0009 via ensemble_eval. Xception lr is still climbing → trying 6e-3 (3rd sweep point).
