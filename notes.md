@@ -121,3 +121,10 @@ Their recipe reimplemented from published hyperparameters only (patch: /tmp/ar_s
 - r0050 DIAG ramp-up + lr 6e-3 seed 0 (the r0047 collapse case): **50.82, clean loss curve (no collapse)**; vs r0047 +22.8, vs r0039 +0.58 (p=0.84). r0051 seed-1 rerun: 50.37, +0.13 vs r0039 (p=0.55), +0.32 vs seed-matched r0049 → not KEEP, so both commits reverted (B0 base stays r0039).
 - **RECOMMENDATION for the final retrain (human decision):** use B0 lr 6e-3 + consistency w=3.0 with a 0→3 ramp over 2 epochs instead of the r0039 config. It scores about the same (2-seed mean 50.59 vs 50.09) and removes the collapse risk (r0047 showed the un-ramped w=3 can collapse to 28). Whatever is used, check that the final train loss is well below 1.0 (collapse ≈1.39).
 - Ensembles with it: r0019+r0036+r0051 52.23 (best 3-model so far), r0019+r0036+r0050 52.12. These are within noise of r0019+r0036+r0014 (52.08).
+
+### Summary after 51 runs (2026-11-13 23:15)
+- Best single: r0019 xception41 lr 3e-3 = 51.49 (seed-lucky; seeds 2-4 average 50.32). Best B0: r0050 (ramp-up + lr 6e-3) = 50.82, but its seed-1 rerun is 50.37; B0 base (r0039, w=3) = 50.24.
+- Best ensembles: 4-model r0019+r0036+r0014+r0034 = 52.21; 3-model r0019+r0036+r0051 = 52.23. Everything 52.0-52.3 is a tie (±0.2 is noise; a collapsed 28-point model once "improved" an ensemble).
+- New since r0040: (1) consistency weight 3.0 is the best weight (KEEP); (2) **consistency can collapse to constant predictions** (loss ≈ 2·ln2); a 0→w ramp over 2 epochs fixes it at no cost; (3) mixup, label smoothing (on w=3), stronger degraded views, degrade aug on the clean view, and drop_rate 0.1/0.4 all fail; (4) no model is compute-limited (long runs are worse); (5) their Swin recipe gets 0.925 on their leaky split but 46.9 on ours.
+- Weakest variants are unchanged: pixelate (0.81-0.83), then gblur2/noise05/webp30 (≈0.84-0.86). Remaining gap: ood ≈0.84-0.85 vs iid ≈0.89.
+- Open proposals for the human: (a) a fixed STEP budget instead of wall clock (the machine slows over time); (b) an epoch-matched test of consistency on xception (≈12 min); (c) ramp-up + lr 6e-3 for the B0 retrain.
