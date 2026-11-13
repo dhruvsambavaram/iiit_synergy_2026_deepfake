@@ -79,3 +79,17 @@ Their recipe reimplemented from published hyperparameters only (patch: /tmp/ar_s
 | r0033 | xception41 r0019 cfg seed 3 (4 ep, 250 steps) | 49.92 | 51.56 | 0.926 |
 | r0034 | xception41 r0019 cfg seed 4 (4 ep, 247 steps) | 50.84 | 51.80 | 0.934 |
 - Seeds 2-4: mean 50.32 vs r0019 51.49 → r0019 was ~1.2 pt seed-lucky (winner's curse, as suspected). The step count also varies with machine speed (196-282 steps in the same 6 min), another reason the final retrain should use fixed EPOCHS.
+| r0035 | densenet121.ra_in1k lr 1e-3 (6 ep, 409 steps) | 48.26 | 51.29 | 0.885 |
+| r0036 | densenet121.ra_in1k lr 3e-3 (5 ep, 358 steps) | 50.05 | **51.95** (best pair) | 0.901 |
+| r0031 | swin_tiny, their recipe + custom head (NOT submittable: non-timm head) | 46.91 | 51.31 | 0.836 |
+- DenseNet-121 ra: lr 3e-3 > 1e-3 (like xception). Best worst-variant of any single model (0.829) and fast (361 img/s, 28 MB).
+
+### Greedy forward selection (2026-11-13 21:00, tools: /tmp/ar_scratch/greedy.py, mean of probs, ≤1 model per run, all runs/ minus r0031)
+| k | models | proxy | iid | ood | unseen | worst |
+|---|---|---|---|---|---|---|
+| 1 | r0019 | 51.49 | 0.893 | 0.848 | 0.863 | 0.812 |
+| 2 | + r0036 densenet121 lr3e-3 | 51.95 | 0.894 | 0.854 | 0.866 | 0.838 |
+| 3 | + r0014 B0 degrade-aug (seed 1) | **52.08** | 0.898 | 0.852 | 0.866 | 0.834 |
+| 4 | + r0034 xception seed 4 | **52.21** | 0.898 | 0.853 | 0.867 | 0.836 |
+| 5 | + r0030 B0 long-budget (or r0032 if long runs excluded: 52.20) | 52.22 | 0.897 | 0.854 | 0.868 | 0.843 |
+- Caveats: (1) the 5th model adds +0.01, which is noise → stop at 3-4. (2) Selecting from ~35 runs on the same val overfits it: expect the real gain over a single model to be smaller than +0.6-0.7. (3) Without the lucky r0019 seed the best 4-ensemble is r0034+r0036+r0018+r0032 = 51.86, so ~0.35 of the headline is seed luck. Since configs are retrained, pick CONFIGS: xception41 lr3e-3 (≈4 ep) ×2 seeds + densenet121 ra lr3e-3 (≈5 ep) + B0 lr8e-3 with degrade aug (≈8 ep) is the robust reading of this table.
