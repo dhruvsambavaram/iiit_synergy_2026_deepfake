@@ -1,0 +1,3 @@
+time	run_id	proxy	auc_main	auc_iid	auc_ood	auc_seen	auc_unseen	auc_worst	worst_variant	desc
+2026-11-14 00:00	r0019+r0034+r0036+r0014	56.0011	0.9020	0.9230	0.8810	0.8980	0.8930	0.8440	crop85	ens4 train-only (xception x2 + densenet121 + B0 degrade), hflip TTA
+2026-11-14 00:46	xception_s0+xception_s1+densenet121+b0_degrade	56.6720	0.9061	0.9191	0.8931	0.9049	0.8994	0.8619	crop85	ens4 train+val retrain (same configs, fixed epochs 4/4/5/8), hflip TTA

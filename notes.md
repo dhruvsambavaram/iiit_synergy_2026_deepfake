@@ -136,3 +136,11 @@ Their recipe reimplemented from published hyperparameters only (patch: /tmp/ar_s
 | r0055 | densenet121.ra lr 3e-3 (r0036 cfg) seed 1 | 50.42 | **52.02** (r0019+r0036+r0055: 52.04; r0019+r0055+r0051: 52.21) | 0.905 |
 - r0055: DenseNet seed 1 (50.42) ≥ seed 0 (50.05) and pairs with r0019 just as well (52.02 vs 51.95) → r0036 was NOT seed-lucky; DenseNet is a reliable 2nd model. r0056 (seed 2) was killed mid-training when the human stopped the loop: no results row, ignore runs/r0056.
 - **LOOP STOPPED by the human, 2026-11-13 ~23:50, after 55 runs.** train.py == r0039 config (B0, lr 8e-3, consistency w=3.0, 6-min budget).
+
+## Final stage (human-led, 2026-11-14 00:00–00:50)
+- Loop stopped after r0055. Ensemble configs: xception41 lr3e-3 (4 ep) ×2 seeds, densenet121.ra lr3e-3 (5 ep), B0 lr8e-3 + degrade aug (8 ep); hflip TTA; threshold 0.660 (Youden on screening-run val preds).
+- Holdout use 1/3, train-only members (r0019, r0034, r0036, r0014): proxy 56.00, clean AUC 0.904, iid 0.923, ood 0.881, unseen 0.893, worst 0.844, acc 84.7%.
+- Retrained on train+val (6,411 imgs) at fixed epochs (tools/final_retrain.sh → runs_final/).
+- Holdout use 2/3, retrained ensemble: **proxy 56.67, clean AUC 0.908, iid 0.919, ood 0.893, unseen 0.899, worst 0.862 (crop85), acc 85.9%** → SUBMITTED.
+- submission/model_weights.pt (245 MB, 4 models), predictions.csv: 3000 rows, 47.6% fake, 2 runs bit-identical on MPS. MPS inference 140 s (incl. loading). Still TODO: Colab T4 timing + CUDA reproducibility check.
+- 1 holdout use remains (reserve; do not spend without a reason).

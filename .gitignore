@@ -1,3 +1,9 @@
 runs/
 __pycache__/
 *.pyc
+runs_final/
+runs_aux/
+final/*.pt
+final/*.csv
+submission/model_weights.pt
+_final_*.py
