@@ -35,9 +35,9 @@ CONFIG = dict(
     time_budget_min=6.0,              # fixed wall-clock training budget (Karpathy-style); --epochs overrides
     epochs=None,
     batch_size=64,
-    lr=3e-4,
+    lr=1e-4,
     weight_decay=0.05,
-    warmup_epochs=0.5,
+    warmup_epochs=1.0,
     label_smoothing=0.0,
     num_workers=6,
 )
