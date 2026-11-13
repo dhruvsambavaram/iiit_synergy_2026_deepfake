@@ -1,0 +1,2 @@
+time	run_id	verdict	proxy	delta	p_better	auc_main	auc_iid	auc_ood	auc_seen	auc_unseen	auc_worst	worst_variant	params_M	ckpt_MB	img_s	train_min	desc
+2026-11-13 13:38	r0001	BASELINE	34.4655	0.0000	1.0000	0.7557	0.8102	0.7011	0.7033	0.7351	0.5186	pixelate	4.0088	16.3065	552.5589	3.4297	baseline: effnet-b0 in1k, BCE, flip+light RRC, 5ep, lr3e-4
