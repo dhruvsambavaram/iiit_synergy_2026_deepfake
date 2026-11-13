@@ -22,7 +22,7 @@ import pandas as pd
 import timm
 import torch
 import torch.nn as nn
-from PIL import Image
+from PIL import Image, ImageFilter
 from torch.utils.data import DataLoader, Dataset
 from torchvision.transforms import v2 as T
 
@@ -47,10 +47,29 @@ def build_model(arch, drop_rate=0.0, pretrained=False):
     return timm.create_model(arch, pretrained=pretrained, num_classes=1, drop_rate=drop_rate)
 
 
+class RandomDegrade:
+    """With prob p apply ONE seen degradation: gaussian blur, gaussian noise, down-up-scale, or pixelate."""
+    def __init__(self, p=0.4): self.p = p
+
+    def __call__(self, img):
+        if random.random() >= self.p: return img
+        k = random.randrange(4); w, h = img.size
+        if k == 0:
+            return img.filter(ImageFilter.GaussianBlur(random.uniform(0.5, 2.0)))
+        if k == 1:
+            a = np.asarray(img).astype(np.float32)
+            a = a + np.random.normal(0, random.uniform(0.01, 0.05) * 255, a.shape)
+            return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8))
+        s = random.uniform(0.4, 0.9) if k == 2 else random.uniform(0.2, 0.5)
+        rs = Image.BILINEAR if k == 2 else Image.NEAREST
+        return img.resize((max(8, int(w * s)), max(8, int(h * s))), rs).resize((w, h), rs)
+
+
 def train_transforms():
     return T.Compose([
         T.RandomHorizontalFlip(),
         T.RandomResizedCrop(IMAGE_SIZE, scale=(0.85, 1.0), ratio=(0.95, 1.05), antialias=True),
+        RandomDegrade(p=0.4),
         T.ToImage(), T.ToDtype(torch.float32, scale=True),
         T.Normalize(MEAN, STD),
     ])
