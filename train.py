@@ -30,7 +30,7 @@ from common import MEAN, STD, SPLITS, IMAGE_SIZE
 
 # ============================================================== EXPERIMENT CONFIG
 CONFIG = dict(
-    arch="efficientnet_b2.ra_in1k",   # any timm ImageNet-pretrained model
+    arch="efficientnet_b0.ra_in1k",   # any timm ImageNet-pretrained model
     drop_rate=0.2,
     time_budget_min=6.0,              # fixed wall-clock training budget (Karpathy-style); --epochs overrides
     epochs=None,
