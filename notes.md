@@ -105,3 +105,6 @@ Their recipe reimplemented from published hyperparameters only (patch: /tmp/ar_s
 - Near misses (positive on both seeds, never KEEP): OneOf degrade aug (+0.96/+0.35), label smoothing 0.1 (+0.31/+0.59).
 - Weakest variants (r0019): pixelate 0.81, then noise05/webp30 ≈0.84; ood gap (iid 0.893 vs ood 0.848) is still the biggest lever.
 - Next: OneOf degrade aug p=0.4 on the r0039 base (single change); then label smoothing 0.1 on the new base.
+- r0041 OneOf degrade p=0.4 on consistency w=3.0 base: 49.11, -1.12 vs r0039 (p=0.04); -0.83 vs seed-matched r0038 → reverted. With w=3.0 the degraded view already supplies the robustness; adding more degradation to the "clean" view just removes clean signal. Ens r0019+r0036+r0041 52.03 (3-model; ≈ r0014 option 52.08).
+- PROPOSAL (not applied, needs human OK since program.md fixes a 6-min wall-clock): the machine keeps slowing (img/s 550→440 on some runs; B0 steps 306-322 earlier vs 277-279 now), so late runs get ~10% fewer updates than their references. A fixed STEP budget calibrated to 6 min on a fresh machine (B0 consistency ≈320 steps, xception ≈280) would make comparisons fair and match the final-retrain plan (fixed epochs).
+- Next: label smoothing 0.1 on the r0039 base.
