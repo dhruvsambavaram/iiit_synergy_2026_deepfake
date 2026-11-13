@@ -38,3 +38,5 @@
 | r0019+r0020 | two xception lrs | — | **51.88** (best ensemble so far) | 0.934 |
 - Xception lr optimum ≈ 3e-3 (1e-3: 48.99, 3e-3: 51.49, 6e-3: 50.64). Next: seresnext50 lr 1e-3 / 3e-3.
 | r0021 | seresnext50 racm lr 1e-3 (~3.2 ep; pixelate 0.67) | 46.85 | 49.37 (w/ r0019: 51.20; r0019+r0020+r0021: 51.72) | 0.838 |
+| r0022 | seresnext50 lr 3e-3 (~3.4 ep) | 48.18 | 49.59 (w/ r0019: 51.16; r0019+r0020+r0022: 51.53) | 0.879 |
+- seresnext50: best iid of any model (0.895) but weak ood (0.80); it doesn't add to the xception ensembles → dropped. Machine is slowing (eval 244 s, img/s 150 for seresnext — the ≥100 guard is not far off for big models).
