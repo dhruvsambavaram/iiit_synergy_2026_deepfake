@@ -29,3 +29,5 @@
 | r0015 | effnet_b2 lr 4e-3 (5 ep) | 48.00 | 49.96 | 0.841 |
 | r0016 | effnet_b2 lr 8e-3 (4 ep; machine slower, 83 s/ep) | 48.45 | 49.44 | 0.892 |
 | r0017 | convnext_tiny in22k-ft lr 5e-4 (only ~3.3 ep / 244 steps → DROPPED per the <4-epoch rule; best iid 0.891, weak ood 0.790) | 46.84 | 49.51 | 0.834 |
+| r0018 | xception41 tf_in1k lr 1e-3 (~3.4 ep / 259 steps, 100-120 s/ep, img/s 168) | 48.99 | **50.50** | 0.852 |
+- Epoch-cutoff note: xception41 (3.4 ep) is borderline like convnext_tiny (3.3 ep), but its single-model score beats B0 and it gives the best ensemble so far → continuing its lr sweep; convnext gets its lr 1e-3 run too, for consistency.
