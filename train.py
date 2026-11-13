@@ -39,6 +39,7 @@ CONFIG = dict(
     weight_decay=0.05,
     warmup_epochs=0.5,
     label_smoothing=0.0,
+    consistency_rampup_epochs=2.0,    # linear 0 -> consistency_weight (avoids collapse to constant preds)
     consistency_weight=3.0,           # EDD-style: BCE(clean)+BCE(degraded) + w*MSE(sigmoid(clean), sigmoid(degraded))
     num_workers=6,
 )
@@ -157,7 +158,8 @@ def main():
             B = len(y)
             logits = model(x.reshape(2 * B, *x.shape[2:])).reshape(B, 2)
             lc, ld = logits[:, 0], logits[:, 1]
-            loss = loss_fn(lc, y) + loss_fn(ld, y) + cfg["consistency_weight"] * \
+            w_c = cfg["consistency_weight"] * min(1.0, step / max(1, cfg["consistency_rampup_epochs"] * len(dl)))
+            loss = loss_fn(lc, y) + loss_fn(ld, y) + w_c * \
                 nn.functional.mse_loss(torch.sigmoid(lc), torch.sigmoid(ld))
             opt.zero_grad(set_to_none=True); loss.backward(); opt.step(); step += 1
             tl += loss.item() * len(y); n += len(y)
