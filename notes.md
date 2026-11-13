@@ -28,3 +28,4 @@
 | r0013 | B0 lr 8e-3 + OneOf degrade p=0.4 | 49.31 | 50.01 | 0.904 |
 | r0015 | effnet_b2 lr 4e-3 (5 ep) | 48.00 | 49.96 | 0.841 |
 | r0016 | effnet_b2 lr 8e-3 (4 ep; machine slower, 83 s/ep) | 48.45 | 49.44 | 0.892 |
+| r0017 | convnext_tiny in22k-ft lr 5e-4 (only ~3.3 ep / 244 steps → DROPPED per the <4-epoch rule; best iid 0.891, weak ood 0.790) | 46.84 | 49.51 | 0.834 |
