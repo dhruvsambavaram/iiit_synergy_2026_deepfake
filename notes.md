@@ -6,3 +6,4 @@
 - r0005 lr 1e-3: KEEP 43.43 (+6.68!). iid 0.877 / ood 0.762, all variants up. lr was the main bottleneck in a 6-min budget. Next: lr 2e-3 to find the edge; retest cutout later (r0004 may have failed because the model was underfit at lr 3e-4).
 - r0006 lr 2e-3 seed0: INCONCLUSIVE 43.83 (+0.40, p=0.68), pixelate 0.585→0.697. r0007 seed1 rerun: KEEP 44.80 (+1.36, p=0.91). Seed spread ≈1 pt → best may be slightly seed-lucky (winner's curse); treat small deltas skeptically. Next: lr 4e-3 once to bracket, then move on to JPEG aug / retest cutout.
 - r0008 lr 4e-3: KEEP 46.36 (+1.56, p=0.92). ood 0.803 (+0.025), pixelate 0.74. High lr seems to regularise (flatter minima) in this overfit regime. Next: lr 8e-3.
+- r0009 lr 8e-3: KEEP 48.35 (+2.00, p=0.97). ood 0.825, pixelate 0.80. Final train loss 0.39 (vs 0.03 at 1e-3), so the overfit is gone. Stable curve. Next: lr 1.2e-2 (smaller step near the edge); if it plateaus, retest cutout/JPEG aug at the new lr.
