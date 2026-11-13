@@ -42,3 +42,5 @@
 - seresnext50: best iid of any model (0.895) but weak ood (0.80); it doesn't add to the xception ensembles → dropped. Machine is slowing (eval 244 s, img/s 150 for seresnext — the ≥100 guard is not far off for big models).
 | r0023 | convnext_tiny lr 1e-3 (~3.5 ep) | 46.07 | 48.85 (w/ r0019: 50.54; r0019+r0020+r0023: 51.15) | 0.836 |
 - convnext_tiny: both lrs weak on ood (0.79/0.77) and it hurts every xception ensemble → dropped for good.
+- r0024 EDD consistency on B0 (clean+degraded views, BCE both + 1.0·MSE): 49.31 = +0.96 vs r0009 (harness verdict DISCARD is vs xception r0019, so ignore it). Only 318 steps (half of B0's), so the gain comes despite half the updates. iid 0.881 / ood 0.832. Rerunning seed 1.
+| r0024 | B0 consistency (5 ep, 318 steps) | 49.31 | 49.72 (w/ r0019: 51.85; **r0019+r0020+r0024: 51.97**, best) | 0.916 |
