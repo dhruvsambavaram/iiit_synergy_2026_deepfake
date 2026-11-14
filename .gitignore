@@ -7,3 +7,8 @@ final/*.pt
 final/*.csv
 submission/model_weights.pt
 _final_*.py
+colab_t4_check/*.pt
+colab_t4_check/*.zip
+colab_t4_check/*.csv
+colab_t4_check/*.py
+colab_t4_check/requirements.txt
