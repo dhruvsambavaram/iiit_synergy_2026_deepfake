@@ -8,7 +8,7 @@ th, td { border: 1px solid #ccc; padding: 3px 5px; vertical-align: top; text-ali
 pre { background: #f6f6f4; padding: 6px 8px; font-size: 7.4pt; line-height: 1.3; white-space: pre-wrap; page-break-inside: avoid; }
 code { font-family: Menlo, monospace; font-size: 8.4pt; } pre code { font-size: 7.4pt; }
 img { max-width: 100%; display: block; margin: 6px auto; page-break-inside: avoid; }
-img[src*="examples_grid"] { max-height: 225mm; }
+img[src*="examples_grid"] { max-height: 225mm; } img[src*="roc_holdout"] { max-height: 95mm; width: auto; }
 hr { border: 0; border-top: 1px solid #ddd; }
 </style></head><body><h1>Robust Deepfake Face Detection with an Automated, Leakage-Free Research Loop</h1>
 <p><strong>Deepfake ML Hackathon (Synergy '26), IIIT Bangalore</strong><br>
@@ -37,7 +37,7 @@ methods"</em>, plus 20 points of robustness across undisclosed image variants.</
 <tbody>
 <tr>
 <td><strong>AUC-ROC (clean)</strong></td>
-<td><strong>0.908</strong></td>
+<td><strong>0.908</strong> (validation: 0.870)</td>
 </tr>
 <tr>
 <td>AUC on held-out image clusters / on random images</td>
@@ -48,8 +48,12 @@ methods"</em>, plus 20 points of robustness across undisclosed image variants.</
 <td>0.899</td>
 </tr>
 <tr>
-<td>Accuracy / F1 at the submitted threshold (0.660)</td>
-<td>85.9% / 0.853</td>
+<td><strong>F1</strong> / accuracy at the submitted threshold</td>
+<td><strong>0.853</strong> / 85.9% (validation: 0.837 / 83.2%)</td>
+</tr>
+<tr>
+<td>Threshold</td>
+<td><strong>0.660</strong>, selected on validation by Youden's J (TPR − FPR)</td>
 </tr>
 <tr>
 <td>Inference, 3,000 test images, NVIDIA T4 (Colab)</td>
@@ -532,18 +536,216 @@ doesn't reverse it. <strong>This is why the final retrain uses the validated epo
 <p>Seed reruns showed the best single Xception run was about 1.2 points seed-lucky (seeds 2–4 average 50.3). We
 therefore retrained <strong>configurations</strong>, not specific checkpoints.</p>
 <hr />
-<h2>7. Final results (holdout, 589 images)</h2>
+<h2>7. Results: AUC-ROC, F1 and threshold selection</h2>
+<p>All metrics are computed with scikit-learn exactly as in the organizers' sample scoring code
+(<code>roc_auc_score(true, confidence)</code>, <code>f1_score(true, label)</code>, <code>accuracy_score(true, label)</code>), by
+<code>tools/report_metrics.py</code>, which also writes <code>docs/metrics_summary.json</code>.</p>
+<ul>
+<li><strong>Validation</strong> (1,479 images): the four ensemble members trained on train only, no TTA. This is where every
+  decision, including the threshold, was made.</li>
+<li><strong>Holdout</strong> (589 images, never used for any decision): the <strong>submitted</strong> model, i.e. the members retrained on
+  train+val, with flip TTA, exactly as <code>inference_script.py</code> predicts.</li>
+</ul>
+<h3>7.1 Headline metrics (submitted threshold 0.660)</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Validation (1,479)</th>
+<th><strong>Holdout (589)</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>AUC-ROC</strong></td>
+<td>0.870</td>
+<td><strong>0.908</strong></td>
+</tr>
+<tr>
+<td><strong>F1</strong></td>
+<td>0.837</td>
+<td><strong>0.853</strong></td>
+</tr>
+<tr>
+<td>Accuracy</td>
+<td>83.2%</td>
+<td><strong>85.9%</strong></td>
+</tr>
+<tr>
+<td>Precision (fake)</td>
+<td>0.844</td>
+<td>0.892</td>
+</tr>
+<tr>
+<td>Recall (fake)</td>
+<td>0.829</td>
+<td>0.816</td>
+</tr>
+<tr>
+<td>Confusion matrix TN / FP / FN / TP</td>
+<td>593 / 118 / 131 / 637</td>
+<td>266 / 29 / 54 / 240</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="ROC on holdout" src="figures/roc_holdout.png" /></p>
+<p><em>Figure 2. ROC curves on the untouched holdout for each member and the submitted ensemble; the dot marks the
+submitted threshold (0.660): TPR 0.82 at FPR 0.10.</em></p>
+<h3>7.2 By subset: familiar images vs never-seen clusters</h3>
+<table>
+<thead>
+<tr>
+<th>Subset</th>
+<th>Val AUC</th>
+<th>Val F1</th>
+<th><strong>Holdout AUC</strong></th>
+<th><strong>Holdout F1</strong></th>
+<th>Holdout accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Random images (iid)</td>
+<td>0.898</td>
+<td>0.852</td>
+<td><strong>0.919</strong></td>
+<td><strong>0.882</strong></td>
+<td>88.2%</td>
+</tr>
+<tr>
+<td>Held-out clusters (ood)</td>
+<td>0.853</td>
+<td>0.827</td>
+<td><strong>0.893</strong></td>
+<td><strong>0.824</strong></td>
+<td>83.8%</td>
+</tr>
+<tr>
+<td>All</td>
+<td>0.870</td>
+<td>0.837</td>
+<td><strong>0.908</strong></td>
+<td><strong>0.853</strong></td>
+<td>85.9%</td>
+</tr>
+</tbody>
+</table>
+<p>The validation set is 62% held-out-cluster images, which is why its overall AUC sits below the holdout's (53%).</p>
+<h3>7.3 Per model (threshold 0.660)</h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Val AUC</th>
+<th>Val F1</th>
+<th>Holdout AUC</th>
+<th>Holdout F1</th>
+<th>Holdout accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Xception41 #1</td>
+<td>0.865</td>
+<td>0.832</td>
+<td>0.905</td>
+<td>0.841</td>
+<td>84.0%</td>
+</tr>
+<tr>
+<td>Xception41 #2</td>
+<td>0.862</td>
+<td>0.832</td>
+<td>0.902</td>
+<td>0.846</td>
+<td>85.1%</td>
+</tr>
+<tr>
+<td>DenseNet-121</td>
+<td>0.855</td>
+<td>0.811</td>
+<td>0.897</td>
+<td>0.812</td>
+<td>82.2%</td>
+</tr>
+<tr>
+<td>EfficientNet-B0</td>
+<td>0.843</td>
+<td>0.799</td>
+<td>0.876</td>
+<td>0.804</td>
+<td>81.3%</td>
+</tr>
+<tr>
+<td><strong>Ensemble (submitted)</strong></td>
+<td><strong>0.870</strong></td>
+<td><strong>0.837</strong></td>
+<td><strong>0.908</strong></td>
+<td><strong>0.853</strong></td>
+<td><strong>85.9%</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The ensemble beats every member on AUC and F1 in both sets.</p>
+<h3>7.4 Threshold selection</h3>
+<p>AUC is threshold-free, so the threshold affects only the <code>label</code> column of <code>predictions.csv</code> (and hence accuracy and
+F1), never the 50-point AUC score.</p>
+<ul>
+<li><strong>Method:</strong> on validation, we chose the threshold that maximizes <strong>Youden's J = TPR − FPR</strong>, the standard choice for
+  balanced classes (50.3% fake). Result: <strong>0.660</strong>, stored in <code>model_weights.pt</code> and applied by the inference script.</li>
+<li><strong>Alternatives considered on validation:</strong></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Threshold</th>
+<th>Val F1</th>
+<th>Val accuracy</th>
+<th>Val precision / recall</th>
+<th>Val false positives</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.500 (default)</td>
+<td>0.836</td>
+<td>82.3%</td>
+<td>0.806 / 0.867</td>
+<td>160</td>
+</tr>
+<tr>
+<td>0.525 (max-F1)</td>
+<td>0.837</td>
+<td>82.5%</td>
+<td>0.810 / 0.866</td>
+<td>156</td>
+</tr>
+<tr>
+<td><strong>0.660 (Youden's J, submitted)</strong></td>
+<td><strong>0.837</strong></td>
+<td><strong>83.2%</strong></td>
+<td><strong>0.844 / 0.829</strong></td>
+<td><strong>118</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Why 0.660:</strong> F1 is essentially flat across these thresholds (0.836–0.837). Youden's J gives the highest
+  accuracy and <strong>26% fewer false alarms</strong> (real faces wrongly flagged as fake). On the holdout it reproduces:
+  accuracy 85.9% vs 85.7% at 0.5, F1 0.853 vs 0.858, false positives 29 vs 44.</li>
+</ul>
+<h3>7.5 Robustness, and the effect of the final retrain (holdout)</h3>
 <table>
 <thead>
 <tr>
 <th></th>
-<th>Train-only ensemble (use 1)</th>
+<th>Train-only ensemble (holdout use 1)</th>
 <th><strong>Retrained on train+val (use 2, submitted)</strong></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Clean AUC</td>
+<td>AUC-ROC</td>
 <td>0.904</td>
 <td><strong>0.908</strong></td>
 </tr>
@@ -569,27 +771,21 @@ therefore retrained <strong>configurations</strong>, not specific checkpoints.</
 </tr>
 </tbody>
 </table>
-<p>Per-corruption AUC (submitted model):</p>
+<p>Per-corruption holdout AUC of the submitted model:</p>
 <ul>
-<li>every corruption scores <strong>≥ 0.890</strong>, except center-crop zoom (0.862);</li>
-<li>JPEG 0.905–0.906, blur 0.909–0.910, noise 0.909–0.912, WebP 0.900, re-share 0.908.</li>
+<li>every corruption is <strong>≥ 0.890</strong>, except center-crop zoom (0.862);</li>
+<li>JPEG q50/q30 0.906/0.905, blur 0.910/0.909, noise 0.912/0.909, WebP 0.900, re-share 0.908, grayscale 0.904,
+  occlusion box 0.896, pixelate 0.890.</li>
 </ul>
-<p>At threshold 0.660:</p>
-<ul>
-<li>F1 0.853, precision 0.892, recall 0.816;</li>
-<li>TN/FP/FN/TP = 266/29/54/240.</li>
-</ul>
-<p>At threshold 0.5: accuracy 85.7%, F1 0.858. The threshold was chosen on val (Youden's J) and changes labels only, not
-AUC.</p>
-<p>The holdout came out slightly <em>above</em> val. That suggests the 55-run selection process did not overfit val, though the
-holdout's single cluster per class may simply be easier.</p>
+<p>The holdout came out slightly <em>above</em> validation. That suggests the 55-run selection process did not overfit
+validation, though the holdout's single held-out cluster per class may simply be easier.</p>
 <hr />
 <h2>8. Explainability (Grad-CAM)</h2>
 <p><img alt="Grad-CAM examples" src="gradcam/examples_grid.png" /></p>
-<p><em>Figure 2. Grad-CAM on holdout images for each member and for the ensemble, explaining the predicted class. Rows 1–3
+<p><em>Figure 3. Grad-CAM on holdout images for each member and for the ensemble, explaining the predicted class. Rows 1–3
 are confident fakes, rows 4–6 confident reals, then the worst false positive and the worst false negative.</em></p>
 <p><img alt="Class-mean Grad-CAM" src="gradcam/class_mean_cams.png" /></p>
-<p><em>Figure 3. Mean Grad-CAM over 150 holdout reals and 150 holdout fakes (the faces are pre-aligned).</em></p>
+<p><em>Figure 4. Mean Grad-CAM over 150 holdout reals and 150 holdout fakes (the faces are pre-aligned).</em></p>
 <ul>
 <li><strong>Decisions rest on the face, not the background.</strong> 83–89% of attention falls in the central face region, and only
   2–6% on the bottom edge.</li>
@@ -654,7 +850,7 @@ autocast on CUDA, and loads every model once.</p>
   resemble a random split of the training distribution, a different selection might have scored marginally higher.
   We chose robustness, because the README and rubric weight it.</li>
 <li><strong>Errors concentrate on heavily degraded images:</strong> strong noise with colour casts on real photos, and heavy blur on
-  fakes (Figure 2).</li>
+  fakes (Figure 3).</li>
 <li><strong>Environment:</strong> training ran on Apple MPS and inference was verified on CUDA. The two give 0 label flips and a
   maximum confidence difference of 0.002.</li>
 </ul>
@@ -711,8 +907,12 @@ instructions are in <code>program.md</code>.</p>
 <td><code>results.tsv</code>, <code>runs/*/train_log.json</code>, <code>notes.md</code>, Figure 1</td>
 </tr>
 <tr>
+<td>Metrics (AUC-ROC, F1, threshold)</td>
+<td><code>docs/metrics_summary.json</code>, Section 7, Figure 2</td>
+</tr>
+<tr>
 <td>Grad-CAM</td>
-<td><code>docs/gradcam/</code> (Figures 2–3)</td>
+<td><code>docs/gradcam/</code> (Figures 3–4)</td>
 </tr>
 </tbody>
 </table>

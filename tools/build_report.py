@@ -12,7 +12,7 @@ th, td { border: 1px solid #ccc; padding: 3px 5px; vertical-align: top; text-ali
 pre { background: #f6f6f4; padding: 6px 8px; font-size: 7.4pt; line-height: 1.3; white-space: pre-wrap; page-break-inside: avoid; }
 code { font-family: Menlo, monospace; font-size: 8.4pt; } pre code { font-size: 7.4pt; }
 img { max-width: 100%; display: block; margin: 6px auto; page-break-inside: avoid; }
-img[src*="examples_grid"] { max-height: 225mm; }
+img[src*="examples_grid"] { max-height: 225mm; } img[src*="roc_holdout"] { max-height: 95mm; width: auto; }
 hr { border: 0; border-top: 1px solid #ddd; }
 """
 body = markdown.markdown((D / "TECHNICAL_REPORT.md").read_text(), extensions=["tables", "fenced_code"])

@@ -22,10 +22,11 @@ Rather than hand-tuning one model, we:
 
 | Final submission (holdout: 589 images never used for any decision) | Value |
 |---|---|
-| **AUC-ROC (clean)** | **0.908** |
+| **AUC-ROC (clean)** | **0.908** (validation: 0.870) |
 | AUC on held-out image clusters / on random images | 0.893 / 0.919 |
 | Mean AUC under 7 corruptions never seen in training | 0.899 |
-| Accuracy / F1 at the submitted threshold (0.660) | 85.9% / 0.853 |
+| **F1** / accuracy at the submitted threshold | **0.853** / 85.9% (validation: 0.837 / 83.2%) |
+| Threshold | **0.660**, selected on validation by Youden's J (TPR − FPR) |
 | Inference, 3,000 test images, NVIDIA T4 (Colab) | **65.6 s**, 5.1 GB peak GPU memory |
 | Reproducibility (T4 vs our machine) | 0 label flips, max confidence difference 0.002 |
 
@@ -249,31 +250,91 @@ therefore retrained **configurations**, not specific checkpoints.
 
 ---
 
-## 7. Final results (holdout, 589 images)
+## 7. Results: AUC-ROC, F1 and threshold selection
 
-| | Train-only ensemble (use 1) | **Retrained on train+val (use 2, submitted)** |
+All metrics are computed with scikit-learn exactly as in the organizers' sample scoring code
+(`roc_auc_score(true, confidence)`, `f1_score(true, label)`, `accuracy_score(true, label)`), by
+`tools/report_metrics.py`, which also writes `docs/metrics_summary.json`.
+
+- **Validation** (1,479 images): the four ensemble members trained on train only, no TTA. This is where every
+  decision, including the threshold, was made.
+- **Holdout** (589 images, never used for any decision): the **submitted** model, i.e. the members retrained on
+  train+val, with flip TTA, exactly as `inference_script.py` predicts.
+
+### 7.1 Headline metrics (submitted threshold 0.660)
+
+| Metric | Validation (1,479) | **Holdout (589)** |
 |---|---|---|
-| Clean AUC | 0.904 | **0.908** |
+| **AUC-ROC** | 0.870 | **0.908** |
+| **F1** | 0.837 | **0.853** |
+| Accuracy | 83.2% | **85.9%** |
+| Precision (fake) | 0.844 | 0.892 |
+| Recall (fake) | 0.829 | 0.816 |
+| Confusion matrix TN / FP / FN / TP | 593 / 118 / 131 / 637 | 266 / 29 / 54 / 240 |
+
+![ROC on holdout](figures/roc_holdout.png)
+
+*Figure 2. ROC curves on the untouched holdout for each member and the submitted ensemble; the dot marks the
+submitted threshold (0.660): TPR 0.82 at FPR 0.10.*
+
+### 7.2 By subset: familiar images vs never-seen clusters
+
+| Subset | Val AUC | Val F1 | **Holdout AUC** | **Holdout F1** | Holdout accuracy |
+|---|---|---|---|---|---|
+| Random images (iid) | 0.898 | 0.852 | **0.919** | **0.882** | 88.2% |
+| Held-out clusters (ood) | 0.853 | 0.827 | **0.893** | **0.824** | 83.8% |
+| All | 0.870 | 0.837 | **0.908** | **0.853** | 85.9% |
+
+The validation set is 62% held-out-cluster images, which is why its overall AUC sits below the holdout's (53%).
+
+### 7.3 Per model (threshold 0.660)
+
+| Model | Val AUC | Val F1 | Holdout AUC | Holdout F1 | Holdout accuracy |
+|---|---|---|---|---|---|
+| Xception41 #1 | 0.865 | 0.832 | 0.905 | 0.841 | 84.0% |
+| Xception41 #2 | 0.862 | 0.832 | 0.902 | 0.846 | 85.1% |
+| DenseNet-121 | 0.855 | 0.811 | 0.897 | 0.812 | 82.2% |
+| EfficientNet-B0 | 0.843 | 0.799 | 0.876 | 0.804 | 81.3% |
+| **Ensemble (submitted)** | **0.870** | **0.837** | **0.908** | **0.853** | **85.9%** |
+
+The ensemble beats every member on AUC and F1 in both sets.
+
+### 7.4 Threshold selection
+AUC is threshold-free, so the threshold affects only the `label` column of `predictions.csv` (and hence accuracy and
+F1), never the 50-point AUC score.
+
+- **Method:** on validation, we chose the threshold that maximizes **Youden's J = TPR − FPR**, the standard choice for
+  balanced classes (50.3% fake). Result: **0.660**, stored in `model_weights.pt` and applied by the inference script.
+- **Alternatives considered on validation:**
+
+| Threshold | Val F1 | Val accuracy | Val precision / recall | Val false positives |
+|---|---|---|---|---|
+| 0.500 (default) | 0.836 | 82.3% | 0.806 / 0.867 | 160 |
+| 0.525 (max-F1) | 0.837 | 82.5% | 0.810 / 0.866 | 156 |
+| **0.660 (Youden's J, submitted)** | **0.837** | **83.2%** | **0.844 / 0.829** | **118** |
+
+- **Why 0.660:** F1 is essentially flat across these thresholds (0.836–0.837). Youden's J gives the highest
+  accuracy and **26% fewer false alarms** (real faces wrongly flagged as fake). On the holdout it reproduces:
+  accuracy 85.9% vs 85.7% at 0.5, F1 0.853 vs 0.858, false positives 29 vs 44.
+
+### 7.5 Robustness, and the effect of the final retrain (holdout)
+
+| | Train-only ensemble (holdout use 1) | **Retrained on train+val (use 2, submitted)** |
+|---|---|---|
+| AUC-ROC | 0.904 | **0.908** |
 | iid / ood AUC | 0.923 / 0.881 | 0.919 / **0.893** |
 | Seen / unseen corruption AUC | 0.898 / 0.893 | **0.905 / 0.899** |
 | Worst corruption | 0.844 | **0.862** (crop-zoom) |
 | Accuracy at threshold | 84.7% | **85.9%** |
 
-Per-corruption AUC (submitted model):
+Per-corruption holdout AUC of the submitted model:
 
-- every corruption scores **≥ 0.890**, except center-crop zoom (0.862);
-- JPEG 0.905–0.906, blur 0.909–0.910, noise 0.909–0.912, WebP 0.900, re-share 0.908.
+- every corruption is **≥ 0.890**, except center-crop zoom (0.862);
+- JPEG q50/q30 0.906/0.905, blur 0.910/0.909, noise 0.912/0.909, WebP 0.900, re-share 0.908, grayscale 0.904,
+  occlusion box 0.896, pixelate 0.890.
 
-At threshold 0.660:
-
-- F1 0.853, precision 0.892, recall 0.816;
-- TN/FP/FN/TP = 266/29/54/240.
-
-At threshold 0.5: accuracy 85.7%, F1 0.858. The threshold was chosen on val (Youden's J) and changes labels only, not
-AUC.
-
-The holdout came out slightly *above* val. That suggests the 55-run selection process did not overfit val, though the
-holdout's single cluster per class may simply be easier.
+The holdout came out slightly *above* validation. That suggests the 55-run selection process did not overfit
+validation, though the holdout's single held-out cluster per class may simply be easier.
 
 ---
 
@@ -281,12 +342,12 @@ holdout's single cluster per class may simply be easier.
 
 ![Grad-CAM examples](gradcam/examples_grid.png)
 
-*Figure 2. Grad-CAM on holdout images for each member and for the ensemble, explaining the predicted class. Rows 1–3
+*Figure 3. Grad-CAM on holdout images for each member and for the ensemble, explaining the predicted class. Rows 1–3
 are confident fakes, rows 4–6 confident reals, then the worst false positive and the worst false negative.*
 
 ![Class-mean Grad-CAM](gradcam/class_mean_cams.png)
 
-*Figure 3. Mean Grad-CAM over 150 holdout reals and 150 holdout fakes (the faces are pre-aligned).*
+*Figure 4. Mean Grad-CAM over 150 holdout reals and 150 holdout fakes (the faces are pre-aligned).*
 
 - **Decisions rest on the face, not the background.** 83–89% of attention falls in the central face region, and only
   2–6% on the bottom edge.
@@ -333,7 +394,7 @@ autocast on CUDA, and loads every model once.
   resemble a random split of the training distribution, a different selection might have scored marginally higher.
   We chose robustness, because the README and rubric weight it.
 - **Errors concentrate on heavily degraded images:** strong noise with colour casts on real photos, and heavy blur on
-  fakes (Figure 2).
+  fakes (Figure 3).
 - **Environment:** training ran on Apple MPS and inference was verified on CUDA. The two give 0 label flips and a
   maximum confidence difference of 0.002.
 
@@ -372,7 +433,8 @@ instructions are in `program.md`.
 | Requirements | `requirements.txt` |
 | Source code | `deepfake-autoresearch/` (harness, training, tools, logs) |
 | Training logs | `results.tsv`, `runs/*/train_log.json`, `notes.md`, Figure 1 |
-| Grad-CAM | `docs/gradcam/` (Figures 2–3) |
+| Metrics (AUC-ROC, F1, threshold) | `docs/metrics_summary.json`, Section 7, Figure 2 |
+| Grad-CAM | `docs/gradcam/` (Figures 3–4) |
 
 **Acknowledgements.**
 
