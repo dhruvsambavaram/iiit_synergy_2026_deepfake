@@ -17,6 +17,21 @@ horizontal-flip TTA.
 
 The full write-up is in [`docs/TECHNICAL_REPORT.pdf`](docs/TECHNICAL_REPORT.pdf) (Markdown source alongside it).
 
+**Team members:** Dhruv Reddy Sambavaram, Sowmya Gupta
+
+## Submission deliverables (per the hackathon README)
+
+| # | Required deliverable | Where |
+|---|---|---|
+| 1 | `predictions.csv` | `submission/predictions.csv` (also at the top of the Drive folder) |
+| 2 | Model weights | `model_weights.pt`, at the top of the Drive folder (245 MB, too large for this zip). Rebuild with `tools/final_retrain.sh` + `tools/pack_submission.py` |
+| 3 | `inference_script.py` | `submission/inference_script.py` |
+| 4 | `requirements.txt` | `submission/requirements.txt` |
+| 5 | Source code with `README.md` | this repository (`README.md` = this file) |
+| 6 | Technical report | `docs/TECHNICAL_REPORT.pdf` (Markdown source: `docs/TECHNICAL_REPORT.md`) |
+| 7 | Training logs / loss curves (optional) | `results.tsv`, `notes.md`, `holdout_log.tsv`, `runs/*/train_log.json`, `runs_final/`, `docs/figures/progress.png`, `final/t4_report.txt` |
+| 8 | Grad-CAM visualizations (optional, bonus) | `docs/gradcam/` |
+
 ---
 
 ## 1. Run the submission (what the judges run)
