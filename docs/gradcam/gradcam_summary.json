@@ -1,0 +1,81 @@
+{
+ "threshold": 0.6600000262260437,
+ "n_holdout": 589,
+ "holdout_acc_at_thr": 0.8590831918505942,
+ "examples": [
+  {
+   "image_id": "5e3bc203-851c-449c-9467-02e6d818eaa6",
+   "label": 1,
+   "subset": "iid",
+   "p": 0.9732,
+   "correct": true
+  },
+  {
+   "image_id": "06e30a68-56e5-4bfc-a7ae-652486173950",
+   "label": 1,
+   "subset": "iid",
+   "p": 0.9697,
+   "correct": true
+  },
+  {
+   "image_id": "ee71dd65-fede-4350-a69c-372c90a502d4",
+   "label": 1,
+   "subset": "ood",
+   "p": 0.9638,
+   "correct": true
+  },
+  {
+   "image_id": "67908d09-249f-40d7-9396-9f805d0a9cc7",
+   "label": 0,
+   "subset": "iid",
+   "p": 0.0369,
+   "correct": true
+  },
+  {
+   "image_id": "d6379d74-e222-4186-bf50-2560c8347b8e",
+   "label": 0,
+   "subset": "iid",
+   "p": 0.0388,
+   "correct": true
+  },
+  {
+   "image_id": "19a207e5-4d1f-432f-bab9-de615adab433",
+   "label": 0,
+   "subset": "ood",
+   "p": 0.039,
+   "correct": true
+  },
+  {
+   "image_id": "9fa69aae-8097-4e53-ab98-90d52f53d6c0",
+   "label": 0,
+   "subset": "iid",
+   "p": 0.9584,
+   "correct": false
+  },
+  {
+   "image_id": "4df18c56-b5b3-4496-b5ed-3b613e7e59e3",
+   "label": 1,
+   "subset": "ood",
+   "p": 0.0496,
+   "correct": false
+  }
+ ],
+ "region_shares_mean_cam": {
+  "real": {
+   "upper (forehead/hair)": 0.14229345321655273,
+   "eyes": 0.2900003492832184,
+   "nose/cheeks": 0.3424960970878601,
+   "mouth/chin": 0.20175795257091522,
+   "bottom/neck": 0.023452123627066612,
+   "central 60% width": 0.885360062122345
+  },
+  "fake": {
+   "upper (forehead/hair)": 0.17990528047084808,
+   "eyes": 0.24986761808395386,
+   "nose/cheeks": 0.2680601477622986,
+   "mouth/chin": 0.24048909544944763,
+   "bottom/neck": 0.061677828431129456,
+   "central 60% width": 0.8297249674797058
+  }
+ }
+}
