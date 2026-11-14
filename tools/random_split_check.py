@@ -1,10 +1,10 @@
 """
-Apples-to-apples comparison with other teams' "random 80/20" numbers.
+Reference measurement: what a conventional random 80/20 (StratifiedKFold) protocol would report.
 
 Trains the CURRENT train.py config on a plain StratifiedKFold(5, shuffle=True, random_state=42) split of all
 7,000 labelled images (fold 0 = val; no near-duplicate grouping, no held-out clusters) and reports AUC /
-accuracy on that fold. This is the protocol used by e.g. the public DeepFakeML repo (their best-epoch single
-models: EffNet-B3 0.914, DenseNet-121 0.919, Swin-T 0.927).
+accuracy on that fold, i.e. what a conventional random 80/20 protocol would report, for comparison with our
+grouped / held-out-cluster validation.
 
 NOT part of the research loop: the model also trains on our val/holdout images, so its run dir must never be
 used for selection or submission.
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     args = ap.parse_args()
 
     df = pd.concat([pd.read_csv(common.SPLITS / f"{s}.csv") for s in ("train", "val", "holdout")], ignore_index=True)
-    # Reproduce the other team's exact fold assignment: StratifiedKFold over train_metadata.csv in FILE order.
+    # Deterministic fold assignment: StratifiedKFold over train_metadata.csv in file order.
     meta = pd.read_csv(Path(df.path.iloc[0]).parents[2] / "train_metadata.csv")
     df = meta[["image_id"]].merge(df, on="image_id", how="left", validate="1:1")
     assert df.path.notna().all() and len(df) == 7000

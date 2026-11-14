@@ -19,12 +19,12 @@ best = df.proxy.where(keep).cummax().ffill()
 fig, ax = plt.subplots(figsize=(8.6, 4.2), facecolor=SURFACE)
 ax.set_facecolor(SURFACE)
 ax.scatter(df.n[~keep], df.proxy[~keep], s=40, facecolor=SURFACE, edgecolor=GRAY, linewidth=1.5, zorder=3,
-           label="Not adopted (discarded, inconclusive, or comparison run)")
+           label="Not adopted (discarded, inconclusive, or ensemble-candidate run)")
 ax.scatter(df.n[keep], df.proxy[keep], s=56, color=BLUE, edgecolor=SURFACE, linewidth=2, zorder=4, label="Kept (new best)")
 ax.step(df.n, best, where="post", color=BLUE, linewidth=2, zorder=2, label="Running best")
 
 notes = [(5, "lr 3e-4 → 1e-3\n(+6.7)", (12.5, 40.0)), (9, "lr 8e-3\nbest B0", (9.5, 52.5)), (19, "Xception41\nlr 3e-3", (16, 54.5)),
-         (28, "25–30 min runs:\nlonger = worse", (27.5, 41.5)), (31, "teammate recipe\n(Swin, 10 ep)", (34, 43.0)),
+         (28, "25–30 min runs:\nlonger = worse", (27.5, 41.5)),
          (47, "lr 6e-3 + consistency\n(collapse)", (44, 31.0))]
 for n, txt, xy in notes:
     y = float(df.loc[df.n == n, "proxy"].iloc[0])

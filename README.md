@@ -61,7 +61,7 @@ docs/                         technical report, Grad-CAM figures, progress figur
 
 | Tool | Purpose |
 |---|---|
-| `tools/final_retrain.sh` | Retrain the 4 ensemble members on train+val at fixed epochs, from their exact saved snapshots |
+| `tools/final_retrain.sh` | Retrain the 4 ensemble members on train+val at fixed epochs, from the exact saved snapshots |
 | `tools/pack_submission.py` | Pack runs into one weights file (TTA flag + Youden threshold from val) |
 | `tools/final_holdout.py` | Score an ensemble on the holdout exactly as submitted (counts as a holdout use; max 3) |
 | `tools/ensemble_eval.py` | Score any combination of runs from saved val predictions (no retraining) |
@@ -122,5 +122,4 @@ Rules followed: only the provided data; ImageNet-pretrained weights only (no JFT
 test images used only for producing predictions (never trained on, selected on, or viewed).
 
 **Credits:** AutoResearch pattern by A. Karpathy. Ideas from the DFDC 2020 solutions (Seferbekov, NTechLab),
-DeepFakeDefenders 2024 (cluster-based splits) and EDD 2026 (consistency training). Teammate work (DeepFakeML)
-contributed the sharpness EDA, the random-split baselines, and the Grad-CAM approach.
+DeepFakeDefenders 2024 (cluster-based splits) and EDD 2026 (consistency training).

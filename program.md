@@ -61,7 +61,7 @@ Never stop to ask the human; keep looping until interrupted.
    Then combine the KEEPs. Watch the train-vs-val gap (tools/sanity_gap.py): baseline is 0.99 train vs 0.74 val AUC.
 3. **Regularisation for label noise**: label smoothing 0.05–0.1, mixup/cutmix (soft labels; NTechLab used mixup), stochastic depth.
    (Real/fake *pair* mixup is not worth it: only ~74 same-source pairs exist.)
-4. **Consistency training** (EDD-style): loss on clean + degraded views of the same image, plus a KL/MSE term between their
+4. **Consistency training** (EDD-style): loss on clean + degraded views of the same image, plus a KL/MSE term between the two
    predictions; optionally an EMA "mean teacher".
 5. **Backbones** (diversity for the final ensemble): convnext_tiny, efficientnet_b2, resnet50, tf_efficientnetv2_s, a small ViT/Swin.
    Note per-variant strengths—an ensemble wants *different* failure modes.
