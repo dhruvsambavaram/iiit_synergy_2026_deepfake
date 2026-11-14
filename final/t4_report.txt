@@ -1,0 +1,6 @@
+GPU: Tesla T4 | torch 2.14.1+cu130 | timm 1.0.31 | python 3.13.16
+Run 1 (cold): 65.6 s = 1.09 min -> efficiency band 20/20
+Run 2 (warm): 57.3 s
+Peak GPU memory: 5139 MB
+T4 vs Mac: label flips 0, max |dconf| 2.12e-03, rank corr 0.999999
+RECOMMENDATION: Mac predictions.csv reproduces on T4. Submit it as-is.

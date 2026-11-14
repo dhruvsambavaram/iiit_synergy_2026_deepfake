@@ -144,3 +144,7 @@ Their recipe reimplemented from published hyperparameters only (patch: /tmp/ar_s
 - Holdout use 2/3, retrained ensemble: **proxy 56.67, clean AUC 0.908, iid 0.919, ood 0.893, unseen 0.899, worst 0.862 (crop85), acc 85.9%** → SUBMITTED.
 - submission/model_weights.pt (245 MB, 4 models), predictions.csv: 3000 rows, 47.6% fake, 2 runs bit-identical on MPS. MPS inference 140 s (incl. loading). Still TODO: Colab T4 timing + CUDA reproducibility check.
 - 1 holdout use remains (reserve; do not spend without a reason).
+
+## T4 verification (Colab, 2026-11-14)
+- Tesla T4, torch 2.14.1+cu130, timm 1.0.31, python 3.13: cold run 65.6 s (1.09 min, efficiency band 20/20), warm 57.3 s, peak GPU mem 5.1 GB.
+- T4 vs Mac predictions: 0 label flips, max |dconf| 2.1e-3 (fp16 vs fp32), rank corr 0.999999 → reproducible.
