@@ -1,0 +1,68 @@
+{
+ "config": {
+  "arch": "efficientnet_b0.ra_in1k",
+  "drop_rate": 0.2,
+  "time_budget_min": 6.0,
+  "epochs": null,
+  "batch_size": 64,
+  "lr": 0.008,
+  "weight_decay": 0.05,
+  "warmup_epochs": 0.5,
+  "label_smoothing": 0.0,
+  "num_workers": 6
+ },
+ "seed": 1,
+ "full": false,
+ "n_train": 4932,
+ "epochs": [
+  {
+   "epoch": 1,
+   "loss": 1.9861281939915247,
+   "sec": 51.98425221443176,
+   "steps": 77
+  },
+  {
+   "epoch": 2,
+   "loss": 0.7487662585524769,
+   "sec": 40.404500007629395,
+   "steps": 154
+  },
+  {
+   "epoch": 3,
+   "loss": 0.5420168812398787,
+   "sec": 41.779107093811035,
+   "steps": 231
+  },
+  {
+   "epoch": 4,
+   "loss": 0.4673729871774649,
+   "sec": 47.66989278793335,
+   "steps": 308
+  },
+  {
+   "epoch": 5,
+   "loss": 0.4395440723988917,
+   "sec": 47.21133279800415,
+   "steps": 385
+  },
+  {
+   "epoch": 6,
+   "loss": 0.38804388820350944,
+   "sec": 48.71017384529114,
+   "steps": 462
+  },
+  {
+   "epoch": 7,
+   "loss": 0.36819142935337956,
+   "sec": 46.8446261882782,
+   "steps": 539
+  },
+  {
+   "epoch": 8,
+   "loss": 0.3328971185705118,
+   "sec": 35.675100803375244,
+   "steps": 596
+  }
+ ],
+ "train_seconds": 360.28449988365173
+}

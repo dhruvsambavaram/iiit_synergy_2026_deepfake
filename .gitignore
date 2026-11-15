@@ -12,3 +12,6 @@ colab_t4_check/*.zip
 colab_t4_check/*.csv
 colab_t4_check/*.py
 colab_t4_check/requirements.txt
+.DS_Store
+.claude/
+hackathon_dataset/

@@ -1,0 +1,44 @@
+{
+ "config": {
+  "arch": "xception41.tf_in1k",
+  "drop_rate": 0.2,
+  "time_budget_min": 6.0,
+  "epochs": null,
+  "batch_size": 64,
+  "lr": 0.003,
+  "weight_decay": 0.05,
+  "warmup_epochs": 0.5,
+  "label_smoothing": 0.0,
+  "num_workers": 6
+ },
+ "seed": 0,
+ "full": false,
+ "n_train": 4932,
+ "epochs": [
+  {
+   "epoch": 1,
+   "loss": 0.5207354213510241,
+   "sec": 94.23268604278564,
+   "steps": 77
+  },
+  {
+   "epoch": 2,
+   "loss": 0.4168617092556768,
+   "sec": 87.01598405838013,
+   "steps": 154
+  },
+  {
+   "epoch": 3,
+   "loss": 0.3412871683959837,
+   "sec": 107.50244188308716,
+   "steps": 231
+  },
+  {
+   "epoch": 4,
+   "loss": 0.27900858077348445,
+   "sec": 72.13552904129028,
+   "steps": 282
+  }
+ ],
+ "train_seconds": 360.89008712768555
+}

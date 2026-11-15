@@ -1,0 +1,50 @@
+{
+ "config": {
+  "arch": "densenet121.ra_in1k",
+  "drop_rate": 0.2,
+  "time_budget_min": 6.0,
+  "epochs": null,
+  "batch_size": 64,
+  "lr": 0.003,
+  "weight_decay": 0.05,
+  "warmup_epochs": 0.5,
+  "label_smoothing": 0.0,
+  "num_workers": 6
+ },
+ "seed": 0,
+ "full": false,
+ "n_train": 4932,
+ "epochs": [
+  {
+   "epoch": 1,
+   "loss": 0.593306410235244,
+   "sec": 91.25508689880371,
+   "steps": 77
+  },
+  {
+   "epoch": 2,
+   "loss": 0.4872020889412273,
+   "sec": 82.3300039768219,
+   "steps": 154
+  },
+  {
+   "epoch": 3,
+   "loss": 0.40313769335096533,
+   "sec": 84.3830738067627,
+   "steps": 231
+  },
+  {
+   "epoch": 4,
+   "loss": 0.3552952567478279,
+   "sec": 62.5172119140625,
+   "steps": 308
+  },
+  {
+   "epoch": 5,
+   "loss": 0.31864148765802386,
+   "sec": 39.584969997406006,
+   "steps": 358
+  }
+ ],
+ "train_seconds": 360.07671999931335
+}
